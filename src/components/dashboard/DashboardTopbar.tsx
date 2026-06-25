@@ -1,4 +1,5 @@
-import { Bell, Settings, ShieldCheck, UserCircle } from "lucide-react";
+import { Bell, Settings, ShieldCheck } from "lucide-react";
+import { ProfileMenu } from "@/components/account/ProfileMenu";
 import { AppLogo } from "@/components/common/AppLogo";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -20,9 +21,7 @@ export function DashboardTopbar() {
         <Button variant="secondary" size="sm" aria-label="Settings">
           <Settings className="h-4 w-4" aria-hidden="true" />
         </Button>
-        <Button variant="secondary" size="sm" aria-label="Profile">
-          <UserCircle className="h-4 w-4" aria-hidden="true" />
-        </Button>
+        <ProfileMenu />
       </div>
     </div>
   );
