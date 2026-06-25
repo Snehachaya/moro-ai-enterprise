@@ -8,19 +8,19 @@ import { SwitchAccount } from "@/components/account/SwitchAccount";
 const sectionTitles: Record<AccountSection, { title: string; description: string }> = {
   details: {
     title: "Account Details",
-    description: "Manage operator identity, contact information, and secure access settings.",
+    description: "",
   },
   modules: {
     title: "Purchased Modules",
-    description: "Review active AI modules, usage health, and marketplace expansion options.",
+    description: "5 active intelligence systems running",
   },
   billing: {
     title: "Billing & Payments",
-    description: "Track subscription plan, renewals, invoices, and payment records.",
+    description: "",
   },
   switch: {
     title: "Switch Account",
-    description: "Move between MoroAI accounts or sign out of the current workspace.",
+    description: "",
   },
 };
 
@@ -29,21 +29,19 @@ export function AccountPage() {
   const section = sectionTitles[activeSection];
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 pb-10">
-      <div>
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-accent">Account Management</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-5xl">{section.title}</h1>
-        <p className="mt-3 max-w-3xl text-slate-400">{section.description}</p>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+    <div className="mx-auto max-w-7xl pb-10">
+      <div className="grid min-h-[calc(100vh-120px)] gap-6 lg:grid-cols-[232px_minmax(0,1fr)]">
         <AccountSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-        <div>
+        <main className="min-w-0 space-y-5">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">{section.title}</h1>
+            {section.description ? <p className="mt-1 text-sm text-slate-400">{section.description}</p> : null}
+          </div>
           {activeSection === "details" ? <ProfileDetails /> : null}
           {activeSection === "modules" ? <PurchasedModules /> : null}
           {activeSection === "billing" ? <BillingPayments /> : null}
           {activeSection === "switch" ? <SwitchAccount /> : null}
-        </div>
+        </main>
       </div>
     </div>
   );

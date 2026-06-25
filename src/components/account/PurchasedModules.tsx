@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CheckCircle2, PackagePlus } from "lucide-react";
+import { Boxes, PackagePlus, ScanFace, ShieldCheck, TriangleAlert, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
@@ -9,19 +9,26 @@ import { cn } from "@/utils/cn";
 
 const progressClassByModuleId: Record<string, string> = {
   human: "w-[86%]",
-  object: "w-[74%]",
-  threat: "w-[62%]",
-  weapon: "w-[41%]",
-  accident: "w-[57%]",
+  object: "w-[92%]",
+  threat: "w-[70%]",
+  weapon: "w-[61%]",
+  accident: "w-[82%]",
+};
+
+const moduleIcons: Record<string, typeof ScanFace> = {
+  human: ScanFace,
+  object: Boxes,
+  threat: ShieldCheck,
+  weapon: Wrench,
+  accident: TriangleAlert,
 };
 
 export function PurchasedModules() {
   return (
-    <Card>
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-white">Purchased Modules</h2>
-          <p className="mt-1 text-sm text-slate-500">Active AI modules assigned to this workspace.</p>
+    <Card className="border-0 bg-transparent shadow-none">
+      <CardHeader className="px-0 pt-0 sm:flex-row sm:items-start sm:justify-between">
+        <div className="sr-only">
+          <h2>Purchased Modules</h2>
         </div>
         <Link to={routes.marketplace}>
           <Button>
@@ -30,26 +37,26 @@ export function PurchasedModules() {
           </Button>
         </Link>
       </CardHeader>
-      <CardContent className="grid gap-4 md:grid-cols-2">
-        {purchasedModules.map((module) => (
-          <div key={module.id} className="rounded-xl border border-borderSubtle bg-white/[0.03] p-4">
+      <CardContent className="grid gap-6 p-0 md:grid-cols-2 xl:grid-cols-3">
+        {purchasedModules.map((module) => {
+          const Icon = moduleIcons[module.id] ?? ShieldCheck;
+
+          return (
+          <div key={module.id} className="rounded-lg border border-borderSubtle bg-[#0b0f14]/95 p-6">
             <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accentSoft text-accent">
-                  <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
-                </span>
-                <div>
-                  <h3 className="font-semibold text-white">{module.name}</h3>
-                  <p className="mt-1 text-sm text-slate-500">Usage health {module.usage}%</p>
-                </div>
-              </div>
-              <Badge variant="success">{module.status}</Badge>
+              <span className="flex h-12 w-12 items-center justify-center rounded-md bg-[#161b2a] text-cyan-100">
+                <Icon className="h-6 w-6" aria-hidden="true" />
+              </span>
+              <Badge variant="success" className="uppercase tracking-wider">{module.status}</Badge>
             </div>
+            <h3 className="mt-6 text-lg font-semibold text-white">{module.name}</h3>
+            <p className="mt-2 text-sm text-slate-400">Pro Plan • Expires {module.expires}</p>
             <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-800">
-              <div className={cn("h-full rounded-full bg-accent", progressClassByModuleId[module.id])} />
+              <div className={cn("h-full rounded-full bg-cyan-200", progressClassByModuleId[module.id])} />
             </div>
           </div>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );

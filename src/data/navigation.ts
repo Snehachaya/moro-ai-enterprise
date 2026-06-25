@@ -1,4 +1,4 @@
-import { Camera, CreditCard, Gauge, LayoutGrid, LockKeyhole, Settings, Shield, Users } from "lucide-react";
+import { Camera, Gauge, LayoutGrid, UserCog } from "lucide-react";
 import type { NavigationItem } from "@/types/navigation";
 
 export const primaryNavigation: NavigationItem[] = [
@@ -8,9 +8,5 @@ export const primaryNavigation: NavigationItem[] = [
 ];
 
 export const accountNavigation: NavigationItem[] = [
-  { label: "Profile", path: "/account/profile", area: "account", icon: Shield },
-  { label: "Billing", path: "/account/billing", area: "account", icon: CreditCard },
-  { label: "Users", path: "/account/users", area: "account", icon: Users },
-  { label: "RBAC", path: "/account/rbac", area: "account", icon: LockKeyhole },
-  { label: "Settings", path: "/account/settings", area: "account", icon: Settings },
+  { label: "Account Management", path: "/account", area: "account", icon: UserCog },
 ];
