@@ -1,5 +1,6 @@
 import { AlertTriangle, Boxes, Cross, ShieldAlert, UserRoundSearch } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/Card";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { detectionModules } from "@/data/modules";
@@ -43,23 +44,25 @@ export function DetectionModules() {
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ delay: index * 0.04, duration: 0.28 }}
               >
-                <Card className="h-full transition duration-200 hover:-translate-y-1 hover:border-cyan-300/30">
-                  <CardContent>
-                    <span className={cn("inline-flex h-11 w-11 items-center justify-center rounded-xl border", accentByModule[module.id])}>
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                    <h3 className="mt-5 text-lg font-semibold text-white">{module.name}</h3>
-                    <p className="mt-3 text-sm leading-6 text-slate-400">{module.summary}</p>
-                    <ul className="mt-5 space-y-2">
-                      {module.capabilities.map((capability) => (
-                        <li key={capability} className="flex gap-2 text-xs text-slate-400">
-                          <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-accent" />
-                          {capability}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
+                <Link to={module.route}>
+                  <Card className="h-full transition duration-200 hover:-translate-y-1 hover:border-cyan-300/30">
+                    <CardContent>
+                      <span className={cn("inline-flex h-11 w-11 items-center justify-center rounded-xl border", accentByModule[module.id])}>
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <h3 className="mt-5 text-lg font-semibold text-white">{module.name}</h3>
+                      <p className="mt-3 text-sm leading-6 text-slate-400">{module.summary}</p>
+                      <ul className="mt-5 space-y-2">
+                        {module.capabilities.map((capability) => (
+                          <li key={capability} className="flex gap-2 text-xs text-slate-400">
+                            <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-accent" />
+                            {capability}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.article>
             );
           })}

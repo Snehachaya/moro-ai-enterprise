@@ -7,6 +7,7 @@ import {
   UserRoundSearch,
   type LucideIcon,
 } from "lucide-react";
+import { routes } from "@/routes/paths";
 
 export type MarketplaceCategory = "Identity" | "Assets" | "Risk" | "Weapons" | "Emergency" | "Bundle";
 
@@ -19,6 +20,7 @@ export interface MarketplaceModule {
   price: number;
   billingCycle: "month";
   icon: LucideIcon;
+  route?: string;
   highlighted?: boolean;
 }
 
@@ -32,6 +34,7 @@ export const marketplaceModules: MarketplaceModule[] = [
     price: 499,
     billingCycle: "month",
     icon: UserRoundSearch,
+    route: routes.humanDetection,
   },
   {
     id: "object-detection",
@@ -42,6 +45,7 @@ export const marketplaceModules: MarketplaceModule[] = [
     price: 399,
     billingCycle: "month",
     icon: Boxes,
+    route: routes.objectDetection,
   },
   {
     id: "threat-detection",
@@ -52,6 +56,7 @@ export const marketplaceModules: MarketplaceModule[] = [
     price: 699,
     billingCycle: "month",
     icon: AlertTriangle,
+    route: routes.threatDetection,
   },
   {
     id: "weapon-detection",
@@ -62,6 +67,7 @@ export const marketplaceModules: MarketplaceModule[] = [
     price: 599,
     billingCycle: "month",
     icon: ShieldQuestion,
+    route: routes.weaponDetection,
   },
   {
     id: "accident-detection",
@@ -72,6 +78,7 @@ export const marketplaceModules: MarketplaceModule[] = [
     price: 799,
     billingCycle: "month",
     icon: Cross,
+    route: routes.accidentDetection,
   },
   {
     id: "master-sentinel-suite",

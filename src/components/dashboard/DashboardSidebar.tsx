@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { AlertTriangle, Boxes, Cross, ShieldCheck, UserRoundSearch, type LucideIcon } from "lucide-react";
 import { moduleNavItems } from "@/data/dashboard";
 import { cn } from "@/utils/cn";
@@ -20,13 +21,13 @@ export function DashboardSidebar() {
         {moduleNavItems.map((item) => {
           const Icon = iconById[item.id] ?? ShieldCheck;
           return (
-            <button
+            <Link
               key={item.id}
+              to={item.route}
               className={cn(
                 "flex w-full items-center justify-between rounded-lg border border-transparent px-3 py-3 text-left transition",
                 item.id === "threat" ? "bg-rose-400/10 text-rose-100" : "text-slate-300 hover:border-borderSubtle hover:bg-white/[0.03]",
               )}
-              type="button"
             >
               <span className="flex items-center gap-3">
                 <Icon className="h-4 w-4" aria-hidden="true" />
@@ -36,7 +37,7 @@ export function DashboardSidebar() {
                 </span>
               </span>
               <span className="text-sm font-semibold text-white">{item.count}</span>
-            </button>
+            </Link>
           );
         })}
       </nav>

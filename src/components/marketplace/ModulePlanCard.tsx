@@ -1,4 +1,5 @@
-import { CheckCircle2, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, CheckCircle2, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -35,7 +36,13 @@ export function ModulePlanCard({ module }: ModulePlanCardProps) {
             <Badge variant={module.highlighted ? "accent" : "neutral"}>{module.category}</Badge>
           </div>
 
-          <h2 className="mt-5 text-xl font-semibold text-white">{module.name}</h2>
+          {module.route ? (
+            <Link to={module.route} className="mt-5 block text-xl font-semibold text-white transition hover:text-cyan-100">
+              {module.name}
+            </Link>
+          ) : (
+            <h2 className="mt-5 text-xl font-semibold text-white">{module.name}</h2>
+          )}
           <p className="mt-3 min-h-20 text-sm leading-6 text-slate-400">{module.description}</p>
 
           <ul className="mt-5 space-y-2">
@@ -64,6 +71,14 @@ export function ModulePlanCard({ module }: ModulePlanCardProps) {
               {isSelected ? "Remove" : "Add Cart"}
             </Button>
           </div>
+          {module.route ? (
+            <Link to={module.route} className="mt-3">
+              <Button type="button" variant="ghost" className="w-full">
+                View full details
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </Link>
+          ) : null}
         </CardContent>
       </Card>
     </motion.article>
