@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CircleUserRound, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { Input } from "@/components/ui/Input";
 import { routes } from "@/routes/paths";
+import { useAuthStore } from "@/store/authStore";
 
 interface RegisterFormValues {
   fullName: string;
@@ -15,6 +16,9 @@ interface RegisterFormValues {
 }
 
 export function RegisterForm() {
+  const navigate = useNavigate();
+  const prepareRegistration = useAuthStore((state) => state.prepareRegistration);
+  const login = useAuthStore((state) => state.login);
   const {
     register,
     handleSubmit,
@@ -24,7 +28,15 @@ export function RegisterForm() {
     defaultValues: { fullName: "", email: "", password: "", confirmPassword: "", terms: false },
   });
 
-  const onSubmit = handleSubmit(() => undefined);
+  const onSubmit = handleSubmit((values) => {
+    prepareRegistration({ name: values.fullName, email: values.email });
+    navigate(routes.verify);
+  });
+
+  const handleSocialRegistration = () => {
+    login("security.admin@moroai.com");
+    navigate(routes.welcome, { replace: true });
+  };
 
   return (
     <form className="space-y-5 p-6 sm:p-8" onSubmit={onSubmit}>
@@ -103,11 +115,11 @@ export function RegisterForm() {
       </Button>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button variant="secondary" type="button" className="w-full">
+        <Button variant="secondary" type="button" className="w-full" onClick={handleSocialRegistration}>
           <CircleUserRound className="h-4 w-4" aria-hidden="true" />
           Google
         </Button>
-        <Button variant="secondary" type="button" className="w-full">
+        <Button variant="secondary" type="button" className="w-full" onClick={handleSocialRegistration}>
           <span className="grid h-4 w-4 grid-cols-2 gap-0.5" aria-hidden="true">
             <span className="bg-cyan-300" />
             <span className="bg-sky-500" />

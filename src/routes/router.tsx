@@ -8,6 +8,7 @@ import { LoginPage } from "@/pages/LoginPage";
 import { MarketplacePage } from "@/pages/MarketplacePage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { RegisterPage } from "@/pages/RegisterPage";
+import { RequireAuth } from "@/routes/RequireAuth";
 import { RouteShellPage } from "@/pages/RouteShellPage";
 import { SubscriptionPage } from "@/pages/SubscriptionPage";
 import { VerifyOTPPage } from "@/pages/VerifyOTPPage";
@@ -30,11 +31,22 @@ export const router = createBrowserRouter(
             { path: routes.register, element: <RegisterPage /> },
             { path: routes.verify, element: <VerifyOTPPage /> },
             { path: routes.otp, element: <Navigate to={routes.verify} replace /> },
-            { path: routes.welcome, element: <WelcomePage /> },
+            {
+              path: routes.welcome,
+              element: (
+                <RequireAuth>
+                  <WelcomePage />
+                </RequireAuth>
+              ),
+            },
           ],
         },
         {
-          element: <DashboardLayout />,
+          element: (
+            <RequireAuth>
+              <DashboardLayout />
+            </RequireAuth>
+          ),
           children: [
             { path: routes.dashboard, element: <RouteShellPage title="Dashboard" area="Operations" /> },
             { path: routes.analytics, element: <RouteShellPage title="Analytics" area="Operations" /> },

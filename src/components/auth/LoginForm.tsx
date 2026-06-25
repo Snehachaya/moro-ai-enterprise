@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CircleUserRound, KeyRound, Mail, Shield } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { Input } from "@/components/ui/Input";
 import { routes } from "@/routes/paths";
+import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
 
 interface LoginFormValues {
@@ -13,7 +14,16 @@ interface LoginFormValues {
   remember: boolean;
 }
 
+interface RedirectLocationState {
+  from?: {
+    pathname: string;
+  };
+}
+
 export function LoginForm() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const login = useAuthStore((state) => state.login);
   const {
     register,
     handleSubmit,
@@ -22,7 +32,16 @@ export function LoginForm() {
     defaultValues: { email: "", password: "", remember: true },
   });
 
-  const onSubmit = handleSubmit(() => undefined);
+  const from = (location.state as RedirectLocationState | null)?.from?.pathname ?? routes.dashboard;
+  const onSubmit = handleSubmit((values) => {
+    login(values.email);
+    navigate(from, { replace: true });
+  });
+
+  const handleSocialLogin = () => {
+    login("security.admin@moroai.com");
+    navigate(routes.dashboard, { replace: true });
+  };
 
   return (
     <form className="space-y-5 p-6 sm:p-8" onSubmit={onSubmit}>
@@ -86,11 +105,11 @@ export function LoginForm() {
       </Button>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button variant="secondary" type="button" className="w-full">
+        <Button variant="secondary" type="button" className="w-full" onClick={handleSocialLogin}>
           <CircleUserRound className="h-4 w-4" aria-hidden="true" />
           Google
         </Button>
-        <Button variant="secondary" type="button" className="w-full">
+        <Button variant="secondary" type="button" className="w-full" onClick={handleSocialLogin}>
           <span className="grid h-4 w-4 grid-cols-2 gap-0.5" aria-hidden="true">
             <span className="bg-cyan-300" />
             <span className="bg-sky-500" />

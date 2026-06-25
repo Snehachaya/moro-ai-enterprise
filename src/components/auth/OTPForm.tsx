@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, KeyRound, MailCheck } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { routes } from "@/routes/paths";
+import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
 
 interface OTPFormValues {
@@ -17,6 +18,9 @@ interface OTPFormValues {
 const otpFields: Array<keyof OTPFormValues> = ["digit0", "digit1", "digit2", "digit3", "digit4", "digit5"];
 
 export function OTPForm() {
+  const navigate = useNavigate();
+  const pendingRegistration = useAuthStore((state) => state.pendingRegistration);
+  const completeRegistration = useAuthStore((state) => state.completeRegistration);
   const {
     register,
     handleSubmit,
@@ -25,7 +29,10 @@ export function OTPForm() {
     defaultValues: { digit0: "", digit1: "", digit2: "", digit3: "", digit4: "", digit5: "" },
   });
 
-  const onSubmit = handleSubmit(() => undefined);
+  const onSubmit = handleSubmit(() => {
+    completeRegistration();
+    navigate(routes.welcome, { replace: true });
+  });
   const hasError = otpFields.some((field) => Boolean(errors[field]));
 
   return (
@@ -37,7 +44,8 @@ export function OTPForm() {
         <p className="mt-5 text-sm font-semibold uppercase tracking-[0.24em] text-accent">Verification</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">Enter security code</h1>
         <p className="mt-2 text-sm leading-6 text-slate-400">
-          We sent a six digit code to <span className="text-slate-200">security.admin@moroai.com</span>.
+          We sent a six digit code to{" "}
+          <span className="text-slate-200">{pendingRegistration?.email ?? "security.admin@moroai.com"}</span>.
         </p>
       </div>
 
