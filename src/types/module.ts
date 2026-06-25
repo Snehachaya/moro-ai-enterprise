@@ -16,5 +16,18 @@ export interface DetectionModule {
     label: string;
     value: string;
   };
+  scenarios?: ModuleScenario[];
+  animalIntrusion?: {
+    title: string;
+    description: string;
+    categories: string[];
+  };
   accent: "cyan" | "blue" | "red" | "rose" | "emerald";
+}
+
+export interface ModuleScenario {
+  title: string;
+  description: string;
+  highlights: string[];
+  priority?: string;
 }

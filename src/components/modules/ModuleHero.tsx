@@ -1,4 +1,4 @@
-import { ArrowRight, BrainCircuit, Camera, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, BrainCircuit, Camera, CheckCircle2, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +19,44 @@ interface ModuleHeroProps {
 }
 
 export function ModuleHero({ module }: ModuleHeroProps) {
+  if (module.id === "threat") {
+    return (
+      <section className="rounded-none border border-dashed border-cyan-300/40 bg-[#0b0f16]/80 px-6 py-14 text-center shadow-[0_0_36px_rgba(6,182,212,0.08)]">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-8 flex items-center justify-between text-sm text-slate-400">
+            <span className="inline-flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Threat Detection
+            </span>
+            <span className="hidden gap-6 md:flex">
+              <span>Modules</span>
+              <span>Intelligence</span>
+              <span>Reports</span>
+              <span className="text-cyan-200">Security</span>
+            </span>
+          </div>
+          <Badge variant="success" className="gap-2">
+            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+            AI Active
+          </Badge>
+          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-white lg:text-5xl">
+            {module.title}
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-400">{module.description}</p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button size="lg">
+              Try Demo
+              <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            </Button>
+            <Button variant="secondary" size="lg">
+              Learn More
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] lg:items-center">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>

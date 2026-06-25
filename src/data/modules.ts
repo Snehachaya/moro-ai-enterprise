@@ -45,9 +45,28 @@ export const detectionModules: DetectionModule[] = [
     capabilities: ["Fire and smoke", "Intrusion events", "Robbery signals"],
     features: ["Intrusion recognition", "Fire and smoke analysis", "Priority incident escalation"],
     workflow: ["Continuous Monitoring", "AI Threat Analysis", "Threat Identification", "Instant Alert System"],
-    price: "₹1499/month",
+    price: "₹1,499/month",
     pricingNote: "Includes high-priority risk models and incident escalation workflows.",
     metric: { label: "Alert latency", value: "<50ms" },
+    scenarios: [
+      {
+        title: "Fire Detection",
+        description: "Detect indoor and outdoor fire incidents. Automatically generate emergency alerts.",
+        highlights: ["Smoke plume analysis", "Thermal event patterns"],
+        priority: "High Priority Event",
+      },
+      {
+        title: "Robbery Detection",
+        description:
+          "Identify suspicious activity and dangerous situations involving harmful weapons. Trigger immediate security alerts.",
+        highlights: ["Weapon identification", "Abnormal behavior analysis"],
+      },
+    ],
+    animalIntrusion: {
+      title: "Animal Intrusion",
+      description: "Recognize dogs, cows, elephants and other animals entering restricted areas. Generate intrusion warnings.",
+      categories: ["Dogs", "Livestock", "Wildlife", "Pests"],
+    },
     accent: "red",
   },
   {
