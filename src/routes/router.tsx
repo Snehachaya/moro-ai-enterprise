@@ -53,10 +53,7 @@ export const router = createBrowserRouter(
           ),
           children: [
             { path: routes.dashboard, element: <DashboardPage /> },
-            { path: routes.analytics, element: <RouteShellPage title="Analytics" area="Operations" /> },
-            { path: routes.alerts, element: <RouteShellPage title="Alerts" area="Operations" /> },
             { path: routes.devices, element: <RouteShellPage title="Devices" area="Operations" /> },
-            { path: routes.auditLogs, element: <RouteShellPage title="Audit Logs" area="Operations" /> },
             { path: routes.marketplace, element: <MarketplacePage /> },
             { path: routes.subscription, element: <SubscriptionPage /> },
             { path: routes.account, element: <AccountPage /> },
