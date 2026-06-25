@@ -2,10 +2,12 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { App } from "@/App";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { moduleById } from "@/data/modules";
 import { PublicLayout } from "@/layouts/PublicLayout";
 import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { MarketplacePage } from "@/pages/MarketplacePage";
+import { ModuleDetailPage } from "@/pages/ModuleDetailPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { RequireAuth } from "@/routes/RequireAuth";
@@ -61,11 +63,11 @@ export const router = createBrowserRouter(
             { path: routes.settings, element: <RouteShellPage title="Settings" area="Account" /> },
             { path: routes.users, element: <RouteShellPage title="Users" area="Account" /> },
             { path: routes.rbac, element: <RouteShellPage title="RBAC" area="Account" /> },
-            { path: routes.humanDetection, element: <RouteShellPage title="Human Detection" area="Modules" /> },
-            { path: routes.objectDetection, element: <RouteShellPage title="Object Detection" area="Modules" /> },
-            { path: routes.threatDetection, element: <RouteShellPage title="Threat Detection" area="Modules" /> },
-            { path: routes.weaponDetection, element: <RouteShellPage title="Weapon Detection" area="Modules" /> },
-            { path: routes.accidentDetection, element: <RouteShellPage title="Accident Detection" area="Modules" /> },
+            { path: routes.humanDetection, element: <ModuleDetailPage module={moduleById.human} /> },
+            { path: routes.objectDetection, element: <ModuleDetailPage module={moduleById.object} /> },
+            { path: routes.threatDetection, element: <ModuleDetailPage module={moduleById.threat} /> },
+            { path: routes.weaponDetection, element: <ModuleDetailPage module={moduleById.weapon} /> },
+            { path: routes.accidentDetection, element: <ModuleDetailPage module={moduleById.accident} /> },
           ],
         },
       ],
