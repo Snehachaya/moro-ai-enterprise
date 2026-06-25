@@ -17,9 +17,10 @@ const navItems = [
 export function PublicLayout() {
   const user = useAuthStore((state) => state.user);
   const location = useLocation();
+  const loggedInLandingRoute = getLoggedInLandingRoute();
 
   if (user && location.pathname === routes.landing) {
-    return <Navigate to={getLoggedInLandingRoute()} replace />;
+    return <Navigate to={loggedInLandingRoute} replace />;
   }
 
   return (
@@ -43,14 +44,29 @@ export function PublicLayout() {
               ))}
             </nav>
             <div className="flex items-center gap-2">
-              <Link to={routes.login}>
-                <Button variant="ghost" size="sm">
-                  Login
-                </Button>
-              </Link>
-              <Link to={routes.register}>
-                <Button size="sm">Register</Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link to={routes.marketplace}>
+                    <Button variant="ghost" size="sm">
+                      Marketplace
+                    </Button>
+                  </Link>
+                  <Link to={loggedInLandingRoute}>
+                    <Button size="sm">Dashboard</Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to={routes.login}>
+                    <Button variant="ghost" size="sm">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to={routes.register}>
+                    <Button size="sm">Register</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
