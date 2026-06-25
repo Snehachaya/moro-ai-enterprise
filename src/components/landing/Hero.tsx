@@ -1,4 +1,4 @@
-import { Activity, ArrowRight, BrainCircuit, Camera, CheckCircle2, LockKeyhole, ShieldCheck } from "lucide-react";
+import { ArrowRight, Camera, CheckCircle2, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/Badge";
@@ -7,7 +7,24 @@ import { Card } from "@/components/ui/Card";
 import { routes } from "@/routes/paths";
 
 const featurePills = ["24/7 AI vigilance", "Threat recognition", "Instant alerts"];
-const feedCells = ["Gate A", "Lobby", "Parking", "Warehouse", "Office", "Perimeter"];
+const feedCells = [
+  { label: "NORTH GATE", box: "left-[42%] top-[24%] h-24 w-16", glow: "left-[28%] top-[42%]" },
+  { label: "SOUTH ROAD", box: "left-[56%] top-[28%] h-20 w-14", glow: "left-[52%] top-[50%]" },
+  { label: "EAST ENTRY", box: "left-[62%] top-[22%] h-16 w-20", glow: "left-[68%] top-[46%]" },
+  { label: "LOADING BAY", box: "left-[20%] top-[36%] h-24 w-14", glow: "left-[62%] top-[50%]" },
+  { label: "CITY PERIMETER", box: "left-[50%] top-[35%] h-20 w-24", glow: "left-[50%] top-[52%]" },
+  { label: "WEST LANE", box: "left-[52%] top-[28%] h-20 w-14", glow: "left-[34%] top-[48%]" },
+  { label: "ALLEY 02", box: "left-[46%] top-[32%] h-16 w-12", glow: "left-[70%] top-[52%]" },
+  { label: "WAREHOUSE", box: "left-[58%] top-[30%] h-20 w-12", glow: "left-[46%] top-[48%]" },
+  { label: "PARKING", box: "left-[74%] top-[32%] h-16 w-16", glow: "left-[34%] top-[54%]" },
+];
+
+const telemetryRows = [
+  { label: "ai.spatial_grid", width: "w-[58%]" },
+  { label: "tracking_stream", width: "w-[67%]" },
+  { label: "edge_sync", width: "w-[76%]" },
+  { label: "video_integrity", width: "w-[85%]" },
+];
 
 export function Hero() {
   return (
@@ -64,8 +81,8 @@ export function Hero() {
           className="relative"
         >
           <div className="absolute -left-8 top-12 h-24 w-24 rounded-full bg-cyan-400/20 blur-3xl" />
-          <Card className="relative overflow-hidden border-cyan-300/20 bg-[#06101f]/88 p-4">
-            <div className="mb-4 flex items-center justify-between border-b border-borderSubtle pb-4">
+          <Card className="relative overflow-hidden border-cyan-300/25 bg-[#031318]/95 p-3 shadow-[0_0_60px_rgba(6,182,212,0.18)]">
+            <div className="mb-3 flex items-center justify-between border-b border-cyan-300/20 pb-3">
               <div className="flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accentSoft text-accent">
                   <Camera className="h-5 w-5" aria-hidden="true" />
@@ -80,49 +97,74 @@ export function Hero() {
               </span>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-[1fr_180px]">
-              <div className="relative min-h-[340px] overflow-hidden rounded-xl border border-borderSubtle bg-slate-950">
-                <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(15,23,42,0.9),rgba(8,18,33,0.7)),radial-gradient(circle_at_50%_42%,rgba(6,182,212,0.2),transparent_18rem)]" />
-                <div className="absolute inset-0 grid grid-cols-3 grid-rows-2 gap-2 p-3">
-                  {feedCells.map((cell, index) => (
-                    <div key={cell} className="relative overflow-hidden rounded-lg border border-white/8 bg-white/[0.04]">
-                      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(6,182,212,0.18),transparent_45%),radial-gradient(circle_at_70%_60%,rgba(248,113,113,0.16),transparent_7rem)]" />
-                      <span className="absolute left-2 top-2 text-[10px] font-medium uppercase tracking-wider text-slate-400">
-                        {cell}
-                      </span>
-                      {index === 1 ? (
-                        <span className="absolute left-[38%] top-[28%] h-20 w-12 rounded border-2 border-cyan-300/80 shadow-glow" />
-                      ) : null}
-                      {index === 4 ? (
-                        <span className="absolute left-[48%] top-[36%] h-14 w-20 rounded border-2 border-rose-400/80 shadow-[0_0_24px_rgba(251,113,133,0.22)]" />
-                      ) : null}
-                    </div>
-                  ))}
+            <div className="relative min-h-[430px] overflow-hidden rounded-xl border border-cyan-300/25 bg-[#02070b]">
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.08)_1px,transparent_1px)] bg-[size:42px_42px]" />
+              <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 gap-px bg-cyan-300/20">
+                <div className="relative col-span-1 row-span-1 overflow-hidden bg-[#041217] p-4">
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-cyan-200/70">Enterprise status</p>
+                  <div className="mt-4 h-14 rounded-sm bg-cyan-300/30" />
+                  <div className="mt-5 space-y-2">
+                    {telemetryRows.map((row, index) => (
+                      <div key={row.label}>
+                        <div className="flex items-center justify-between text-[9px] uppercase tracking-wider text-cyan-100/50">
+                          <span>{row.label}</span>
+                          <span>{84 + index * 3}%</span>
+                        </div>
+                        <div className="mt-1 h-1 overflow-hidden rounded-full bg-cyan-950">
+                          <div className={`h-full rounded-full bg-cyan-300 ${row.width}`} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="absolute bottom-4 left-4 rounded-lg border border-cyan-300/20 bg-slate-950/80 px-3 py-2 backdrop-blur">
-                  <p className="text-[10px] uppercase tracking-widest text-cyan-200">Person: Known_ID_402</p>
+
+                {feedCells.map((feed, index) => (
+                  <div
+                    key={feed.label}
+                    className={[
+                      "relative overflow-hidden bg-[#061016]",
+                      index === 1 ? "col-span-2 row-span-1" : "",
+                      index === 4 ? "col-span-2 row-span-1" : "",
+                    ].join(" ")}
+                  >
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,182,212,0.12),rgba(2,8,23,0.18)),radial-gradient(circle_at_50%_52%,rgba(248,113,113,0.32),transparent_4.2rem),radial-gradient(circle_at_70%_20%,rgba(125,211,252,0.2),transparent_5rem)]" />
+                    <div className="absolute inset-x-0 bottom-0 h-[46%] bg-[linear-gradient(12deg,transparent_42%,rgba(148,163,184,0.13)_43%,transparent_45%),linear-gradient(168deg,transparent_42%,rgba(148,163,184,0.12)_43%,transparent_45%)]" />
+                    <div className="absolute inset-x-0 top-[18%] flex justify-between px-4">
+                      {Array.from({ length: 7 }).map((_, buildingIndex) => (
+                        <span
+                          key={buildingIndex}
+                          className="h-28 w-[9%] rounded-t-sm bg-slate-950/45 shadow-[inset_0_0_18px_rgba(6,182,212,0.08)]"
+                        />
+                      ))}
+                    </div>
+                    <span className={`absolute ${feed.glow} h-6 w-6 rounded-full bg-rose-400/55 blur-md`} />
+                    <span className={`absolute ${feed.box} rounded-sm border-2 border-emerald-400/90 shadow-[0_0_18px_rgba(52,211,153,0.45)]`} />
+                    <span className="absolute left-2 top-2 text-[9px] font-medium uppercase tracking-[0.18em] text-cyan-100/60">
+                      {feed.label}
+                    </span>
+                    <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[8px] uppercase tracking-wider text-cyan-100/35">
+                      <span>cam_{String(index + 1).padStart(2, "0")}</span>
+                      <span>tracking</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="absolute inset-x-0 top-[47%] z-10 flex justify-center">
+                <div className="border border-cyan-300/70 bg-[#031318]/92 px-5 py-3 shadow-[0_0_28px_rgba(6,182,212,0.22)] backdrop-blur">
+                  <p className="font-mono text-base uppercase tracking-[0.28em] text-cyan-100 sm:text-xl">Person: Known_ID_402</p>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                {[
-                  { label: "Confidence", value: "98.4%", icon: BrainCircuit },
-                  { label: "Active Feeds", value: "128", icon: Activity },
-                  { label: "Encrypted", value: "Edge AI", icon: LockKeyhole },
-                ].map((stat) => {
-                  const Icon = stat.icon;
-                  return (
-                    <div key={stat.label} className="rounded-xl border border-borderSubtle bg-white/[0.04] p-4">
-                      <Icon className="h-5 w-5 text-accent" aria-hidden="true" />
-                      <p className="mt-4 text-xs uppercase tracking-wider text-slate-500">{stat.label}</p>
-                      <p className="mt-1 text-xl font-semibold text-white">{stat.value}</p>
-                    </div>
-                  );
-                })}
-                <div className="rounded-xl border border-rose-400/30 bg-rose-500/10 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-rose-200">Threat Detected</p>
-                  <p className="mt-2 text-sm text-slate-300">Knife-like object detected near restricted zone.</p>
-                </div>
+              <div className="absolute bottom-3 left-3 grid w-44 gap-1 text-[9px] uppercase tracking-[0.16em] text-cyan-100/45">
+                {["vector lock", "edge feed stable", "subject confidence 98.4"].map((item) => (
+                  <span key={item} className="rounded-sm bg-slate-950/45 px-2 py-1">
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <div className="absolute bottom-3 right-3 rounded-sm border border-rose-400/45 bg-rose-500/10 px-3 py-2">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-rose-200">Threat: knife detected</p>
               </div>
             </div>
           </Card>
