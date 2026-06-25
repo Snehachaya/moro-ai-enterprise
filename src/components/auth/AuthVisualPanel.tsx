@@ -10,7 +10,7 @@ export function AuthVisualPanel() {
     <aside className="relative hidden min-h-screen overflow-hidden border-r border-borderSubtle bg-surface/40 p-8 lg:flex lg:flex-col lg:justify-between">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_20%,rgba(6,182,212,0.16),transparent_24rem),radial-gradient(circle_at_88%_74%,rgba(99,102,241,0.12),transparent_28rem)]" />
       <div className="relative z-10">
-        <AppLogo />
+        <AppLogo linked />
         <Badge variant="accent" className="mt-10 gap-2">
           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           Secure access portal
