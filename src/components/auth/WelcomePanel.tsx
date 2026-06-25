@@ -49,7 +49,7 @@ export function WelcomePanel() {
         })}
       </div>
 
-      <Link to={routes.subscription} className="block">
+      <Link to={routes.marketplace} className="block">
         <Button className="w-full" size="lg">
           Choose subscription
           <ArrowRight className="h-5 w-5" aria-hidden="true" />

@@ -8,7 +8,6 @@ export const routes = {
   marketplace: "/marketplace",
   subscription: "/subscription",
   dashboard: "/dashboard",
-  devices: "/devices",
   account: "/account",
   profile: "/account/profile",
   billing: "/account/billing",

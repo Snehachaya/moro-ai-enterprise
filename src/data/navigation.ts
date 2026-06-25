@@ -1,9 +1,8 @@
-import { Camera, Gauge, LayoutGrid, UserCog } from "lucide-react";
+import { Gauge, LayoutGrid, UserCog } from "lucide-react";
 import type { NavigationItem } from "@/types/navigation";
 
 export const primaryNavigation: NavigationItem[] = [
   { label: "Dashboard", path: "/dashboard", area: "dashboard", icon: Gauge },
-  { label: "Devices", path: "/devices", area: "dashboard", icon: Camera },
   { label: "Marketplace", path: "/marketplace", area: "marketplace", icon: LayoutGrid },
 ];
 

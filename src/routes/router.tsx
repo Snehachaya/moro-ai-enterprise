@@ -13,7 +13,6 @@ import { ModuleDetailPage } from "@/pages/ModuleDetailPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { RequireAuth } from "@/routes/RequireAuth";
-import { RouteShellPage } from "@/pages/RouteShellPage";
 import { SubscriptionPage } from "@/pages/SubscriptionPage";
 import { VerifyOTPPage } from "@/pages/VerifyOTPPage";
 import { WelcomePage } from "@/pages/WelcomePage";
@@ -53,7 +52,6 @@ export const router = createBrowserRouter(
           ),
           children: [
             { path: routes.dashboard, element: <DashboardPage /> },
-            { path: routes.devices, element: <RouteShellPage title="Devices" area="Operations" /> },
             { path: routes.marketplace, element: <MarketplacePage /> },
             { path: routes.subscription, element: <SubscriptionPage /> },
             { path: routes.account, element: <AccountPage /> },

@@ -1,7 +1,9 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet } from "react-router-dom";
 import { AppLogo } from "@/components/common/AppLogo";
 import { Button } from "@/components/ui/Button";
+import { getLoggedInLandingRoute } from "@/routes/getLoggedInLandingRoute";
 import { routes } from "@/routes/paths";
+import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
 
 const navItems = [
@@ -13,6 +15,12 @@ const navItems = [
 ];
 
 export function PublicLayout() {
+  const user = useAuthStore((state) => state.user);
+
+  if (user) {
+    return <Navigate to={getLoggedInLandingRoute()} replace />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b border-white/5 bg-background/78 backdrop-blur-xl">
