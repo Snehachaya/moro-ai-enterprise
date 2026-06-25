@@ -4,6 +4,7 @@ import { AuthLayout } from "@/layouts/AuthLayout";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { moduleById } from "@/data/modules";
 import { PublicLayout } from "@/layouts/PublicLayout";
+import { DashboardPage } from "@/pages/DashboardPage";
 import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { MarketplacePage } from "@/pages/MarketplacePage";
@@ -50,7 +51,7 @@ export const router = createBrowserRouter(
             </RequireAuth>
           ),
           children: [
-            { path: routes.dashboard, element: <RouteShellPage title="Dashboard" area="Operations" /> },
+            { path: routes.dashboard, element: <DashboardPage /> },
             { path: routes.analytics, element: <RouteShellPage title="Analytics" area="Operations" /> },
             { path: routes.alerts, element: <RouteShellPage title="Alerts" area="Operations" /> },
             { path: routes.devices, element: <RouteShellPage title="Devices" area="Operations" /> },
