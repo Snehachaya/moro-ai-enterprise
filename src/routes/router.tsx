@@ -4,6 +4,7 @@ import { AuthLayout } from "@/layouts/AuthLayout";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { moduleById } from "@/data/modules";
 import { PublicLayout } from "@/layouts/PublicLayout";
+import { AccountPage } from "@/pages/AccountPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { LandingPage } from "@/pages/LandingPage";
 import { LoginPage } from "@/pages/LoginPage";
@@ -58,7 +59,7 @@ export const router = createBrowserRouter(
             { path: routes.auditLogs, element: <RouteShellPage title="Audit Logs" area="Operations" /> },
             { path: routes.marketplace, element: <MarketplacePage /> },
             { path: routes.subscription, element: <SubscriptionPage /> },
-            { path: routes.account, element: <Navigate to={routes.profile} replace /> },
+            { path: routes.account, element: <AccountPage /> },
             { path: routes.profile, element: <RouteShellPage title="Profile" area="Account" /> },
             { path: routes.billing, element: <RouteShellPage title="Billing" area="Account" /> },
             { path: routes.settings, element: <RouteShellPage title="Settings" area="Account" /> },
