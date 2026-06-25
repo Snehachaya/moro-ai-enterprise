@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { accountProfile } from "@/data/account";
+import { accountProfile, purchasedModules } from "@/data/account";
 import { routes } from "@/routes/paths";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
@@ -45,6 +45,7 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
   const logout = useAuthStore((state) => state.logout);
   const displayName = user?.name ?? accountProfile.fullName;
   const displayEmail = user?.email ?? accountProfile.email;
+  const activeModuleCount = purchasedModules.length;
 
   useEffect(() => {
     if (!isOpen) {
@@ -157,7 +158,7 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
               </div>
               <div className="mt-4 flex items-center justify-between text-xs text-slate-300">
                 <span>Modules Active</span>
-                <span>5 / 5</span>
+                <span>{activeModuleCount} / 5</span>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800">
                 <div className="h-full w-full rounded-full bg-accent" />
