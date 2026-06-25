@@ -8,7 +8,7 @@ export function DashboardTopbar() {
   return (
     <div className="flex flex-col gap-4 rounded-xl border border-borderSubtle bg-surface/80 p-4 shadow-glass backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between">
       <div className="flex items-center gap-4">
-        <AppLogo />
+        <AppLogo linked />
         <Badge variant="success" className="gap-2">
           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
           System Online

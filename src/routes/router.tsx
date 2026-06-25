@@ -25,7 +25,10 @@ export const router = createBrowserRouter(
       children: [
         {
           element: <PublicLayout />,
-          children: [{ path: routes.landing, element: <LandingPage /> }],
+          children: [
+            { path: routes.landing, element: <LandingPage /> },
+            { path: routes.home, element: <LandingPage /> },
+          ],
         },
         {
           element: <AuthLayout />,

@@ -14,7 +14,7 @@ export function DashboardLayout() {
   return (
     <div className="min-h-screen bg-background text-slate-100">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-borderSubtle bg-surface/90 px-4 py-5 backdrop-blur-xl lg:block">
-        <AppLogo className="px-2" />
+        <AppLogo className="px-2" linked />
         <nav className="mt-8 space-y-1">
           {navigation.map((item) => {
             const Icon = item.icon;
