@@ -1,7 +1,10 @@
-import { Edit3, KeyRound } from "lucide-react";
+import { Edit3, KeyRound, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { accountProfile } from "@/data/account";
+import { routes } from "@/routes/paths";
+import { useAuthStore } from "@/store/authStore";
 
 const profileFields = [
   { label: "Full Name", value: accountProfile.fullName },
@@ -11,6 +14,9 @@ const profileFields = [
 ];
 
 export function ProfileDetails() {
+  const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+
   return (
     <section>
       <Card className="overflow-hidden rounded-lg border-borderSubtle bg-[#0b0f14]/95">
@@ -49,6 +55,16 @@ export function ProfileDetails() {
               <Button variant="secondary">
                 <KeyRound className="h-4 w-4" aria-hidden="true" />
                 Change Password
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  logout();
+                  navigate(routes.home, { replace: true });
+                }}
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                Logout
               </Button>
             </div>
           </div>

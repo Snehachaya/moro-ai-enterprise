@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell,
   CreditCard,
   Download,
-  LogOut,
   PackageCheck,
   Plus,
   Repeat2,
@@ -40,9 +39,7 @@ interface ProfileMenuProps {
 export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
   const displayName = user?.name ?? accountProfile.fullName;
   const displayEmail = user?.email ?? accountProfile.email;
   const activeModuleCount = purchasedModules.length;
@@ -189,21 +186,6 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
             </div>
 
             <div className="border-t border-borderSubtle p-5">
-              <Button
-                variant="ghost"
-                className="w-full justify-start rounded-md border border-borderSubtle text-rose-100 hover:bg-rose-500/10"
-                onClick={() => {
-                  logout();
-                  setIsOpen(false);
-                  navigate(routes.home, { replace: true });
-                }}
-              >
-                <LogOut className="h-4 w-4" aria-hidden="true" />
-                <span>
-                  <span className="block text-sm font-semibold">Sign Out</span>
-                  <span className="block text-xs font-normal text-rose-100/60">Securely log out from MoroAI</span>
-                </span>
-              </Button>
               <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-slate-500">
                 <span>MoroAI</span>
                 <span>-</span>
