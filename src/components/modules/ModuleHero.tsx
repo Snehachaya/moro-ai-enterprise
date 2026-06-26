@@ -302,17 +302,40 @@ export function ModuleHero({ module }: ModuleHeroProps) {
 
           <div className="mt-4 grid gap-4 md:grid-cols-[1fr_160px]">
             <div className="relative min-h-80 overflow-hidden rounded-xl border border-white/10 bg-slate-950">
-              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(6,182,212,0.16),transparent_42%),radial-gradient(circle_at_62%_48%,rgba(248,113,113,0.16),transparent_9rem)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_58%_48%,rgba(244,63,94,0.2),transparent_8rem),linear-gradient(135deg,rgba(6,182,212,0.14),rgba(2,8,23,0.86))]" />
               <div className="absolute inset-0 grid grid-cols-2 gap-3 p-4">
-                {[0, 1, 2, 3].map((cell) => (
-                  <div key={cell} className="relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.035]">
+                {[
+                  { label: "Entrance", box: "left-[45%] top-[24%] h-20 w-12", alert: false },
+                  { label: "Lobby", box: "left-[39%] top-[32%] h-16 w-28", alert: true },
+                  { label: "Corridor", box: "left-[22%] top-[46%] h-12 w-24", alert: false },
+                  { label: "Security Desk", box: "left-[58%] top-[34%] h-20 w-12", alert: false },
+                ].map((cell, index) => (
+                  <div key={cell.label} className="relative overflow-hidden rounded-lg border border-white/10 bg-[#061016]">
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,182,212,0.12),rgba(2,8,23,0.38)),radial-gradient(circle_at_60%_56%,rgba(244,63,94,0.18),transparent_4rem)]" />
+                    <div className="absolute inset-x-0 top-[18%] flex justify-between px-3">
+                      {Array.from({ length: 6 }).map((_, buildingIndex) => (
+                        <span key={buildingIndex} className="h-24 w-[10%] bg-slate-950/45" />
+                      ))}
+                    </div>
+                    <div className="absolute inset-x-0 bottom-0 h-[45%] bg-[linear-gradient(12deg,transparent_44%,rgba(148,163,184,0.13)_45%,transparent_47%),linear-gradient(168deg,transparent_44%,rgba(148,163,184,0.1)_45%,transparent_47%)]" />
                     <span className="absolute left-3 top-3 text-[10px] uppercase tracking-widest text-slate-500">
-                      Feed 0{cell + 1}
+                      {cell.label}
                     </span>
-                    {cell === 1 ? <span className="absolute left-[42%] top-[26%] h-20 w-14 rounded border-2 border-cyan-300/80 shadow-glow" /> : null}
-                    {cell === 2 ? <span className="absolute left-[30%] top-[48%] h-12 w-28 rounded border-2 border-rose-300/80" /> : null}
+                    <span className={`absolute ${cell.box} rounded-sm border-2 ${cell.alert ? "border-rose-300 shadow-[0_0_22px_rgba(251,113,133,0.38)]" : "border-cyan-300/75 shadow-glow"}`} />
+                    {cell.alert ? (
+                      <span className="absolute bottom-3 left-3 rounded border border-rose-300/35 bg-rose-500/15 px-2 py-1 text-[9px] uppercase tracking-[0.18em] text-rose-100">
+                        Knife-like object
+                      </span>
+                    ) : (
+                      <span className="absolute bottom-3 left-3 rounded border border-cyan-300/25 bg-cyan-300/10 px-2 py-1 text-[9px] uppercase tracking-[0.18em] text-cyan-100/70">
+                        Tracking {index + 1}
+                      </span>
+                    )}
                   </div>
                 ))}
+              </div>
+              <div className="absolute bottom-5 right-5 rounded border border-rose-300/40 bg-rose-500/15 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-rose-100">Weapon Confidence 97%</p>
               </div>
             </div>
             <div className="space-y-3">
