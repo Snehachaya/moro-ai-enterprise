@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, BrainCircuit, Camera, CheckCircle2, ShieldCheck } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, BrainCircuit, Camera, CheckCircle2, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -160,6 +160,76 @@ export function ModuleHero({ module }: ModuleHeroProps) {
                 </div>
                 <div className="absolute bottom-3 right-8 text-[8px] uppercase tracking-[0.18em] text-cyan-100/45">
                   confidence: 0.98
+                </div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      </section>
+    );
+  }
+
+  if (module.id === "accident") {
+    return (
+      <section className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)] lg:items-center">
+        <ModuleHeroContent module={module} />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.06, duration: 0.32 }}
+        >
+          <Card className="overflow-hidden border-cyan-300/20 bg-[#080b0f] p-4 shadow-[0_0_70px_rgba(6,182,212,0.11)]">
+            <div className="relative min-h-[500px] overflow-hidden rounded-xl bg-[#0a0d11]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_48%,rgba(244,63,94,0.12),transparent_14rem),linear-gradient(135deg,rgba(2,8,23,0.58),rgba(0,0,0,0.96))]" />
+              <div className="absolute left-4 top-4 border border-slate-700 bg-black/65 px-4 py-2">
+                <p className="font-mono text-sm uppercase tracking-[0.24em] text-cyan-100">CAM-04 : Intersection Alpha</p>
+              </div>
+              <div className="absolute right-4 top-4 rounded-sm border border-rose-300/35 bg-rose-500/20 px-4 py-2">
+                <p className="font-mono text-sm uppercase tracking-[0.2em] text-rose-100">Anomaly Detected</p>
+              </div>
+
+              <div className="absolute left-1/2 top-16 h-[350px] w-[78%] -translate-x-1/2 rotate-[-3deg] overflow-hidden rounded-2xl border border-white/10 bg-black/70 shadow-[0_26px_70px_rgba(0,0,0,0.45)]">
+                <div className="absolute inset-0 p-7">
+                  <div className="grid h-full grid-cols-4 grid-rows-3 gap-2">
+                    {Array.from({ length: 12 }).map((_, index) => (
+                      <div key={index} className="relative overflow-hidden rounded-sm border border-white/5 bg-zinc-900">
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(148,163,184,0.18),rgba(24,24,27,0.7)),radial-gradient(circle_at_54%_55%,rgba(148,163,184,0.18),transparent_4rem)] grayscale" />
+                        <div className="absolute inset-x-0 bottom-0 h-[48%] bg-[linear-gradient(12deg,transparent_44%,rgba(226,232,240,0.12)_45%,transparent_47%),linear-gradient(168deg,transparent_44%,rgba(226,232,240,0.1)_45%,transparent_47%)]" />
+                        <span className="absolute left-[42%] top-[36%] h-8 w-12 rounded-sm border border-white/20 bg-white/10" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="absolute left-[18%] top-[22%] h-24 w-44 border-2 border-cyan-300 bg-cyan-300/10 shadow-glow">
+                  <span className="absolute left-2 top-[-24px] font-mono text-xs uppercase tracking-wider text-cyan-100">Vehicle 98%</span>
+                </div>
+                <div className="absolute left-[51%] top-[45%] h-32 w-28 border-2 border-rose-300 bg-rose-300/18 shadow-[0_0_24px_rgba(252,165,165,0.32)]">
+                  <span className="absolute left-2 top-[-34px] font-mono text-xs uppercase tracking-wider text-rose-100">
+                    Fall Detected
+                    <br />
+                    99%
+                  </span>
+                  <span className="absolute inset-0 flex items-center justify-center text-rose-100">
+                    <AlertTriangle className="h-14 w-14" aria-hidden="true" />
+                  </span>
+                </div>
+              </div>
+
+              <div className="absolute bottom-7 left-[27%] right-7 rounded-md border border-white/10 bg-black/86 p-5 shadow-[0_16px_48px_rgba(0,0,0,0.45)] backdrop-blur">
+                <p className="font-mono text-sm uppercase tracking-[0.28em] text-white">Live Analysis</p>
+                <div className="mt-4 space-y-3 font-mono text-sm">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-white">Trajectory Tracking</span>
+                    <span className="text-emerald-300">Optimal</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-white">Velocity Delta</span>
+                    <span className="text-rose-200">Critical</span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+                    <div className="h-full w-[85%] rounded-full bg-rose-200" />
+                  </div>
                 </div>
               </div>
             </div>
