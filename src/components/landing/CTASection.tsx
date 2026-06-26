@@ -1,9 +1,14 @@
 import { ArrowRight, Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { routes } from "@/routes/paths";
+import { useAuthStore } from "@/store/authStore";
 
 export function CTASection() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return (
     <section id="contact" className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8">
       <div className="absolute inset-x-0 bottom-0 -z-10 h-64 bg-[radial-gradient(circle_at_50%_100%,rgba(6,182,212,0.18),transparent_34rem)]" />
@@ -29,10 +34,12 @@ export function CTASection() {
                 <Mail className="h-5 w-5" aria-hidden="true" />
                 Contact Sales
               </Button>
-              <Button variant="secondary" size="lg">
-                View Pricing
-                <ArrowRight className="h-5 w-5" aria-hidden="true" />
-              </Button>
+              <Link to={isAuthenticated ? routes.subscription : routes.login}>
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto">
+                  View Pricing
+                  <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                </Button>
+              </Link>
             </div>
           </div>
         </Card>
