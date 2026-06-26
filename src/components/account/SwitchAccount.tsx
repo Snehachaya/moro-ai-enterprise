@@ -37,7 +37,7 @@ export function SwitchAccount() {
             <div>
               <h3 className="text-lg font-medium text-rose-100">Danger Zone</h3>
               <p className="mt-2 text-sm text-rose-100/70">
-                You will be redirected to the login page. All active sessions on this device will be terminated.
+                You will be redirected to the home page. All active sessions on this device will be terminated.
               </p>
             </div>
           </div>
@@ -45,7 +45,7 @@ export function SwitchAccount() {
             variant="danger"
             onClick={() => {
               logout();
-              navigate(routes.login, { replace: true });
+              navigate(routes.home, { replace: true });
             }}
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />

@@ -8,10 +8,10 @@ interface RequireAuthProps {
 }
 
 export function RequireAuth({ children }: RequireAuthProps) {
-  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const location = useLocation();
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to={routes.login} replace state={{ from: location }} />;
   }
 

@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { Input } from "@/components/ui/Input";
-import { getLoggedInLandingRoute } from "@/routes/getLoggedInLandingRoute";
 import { routes } from "@/routes/paths";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
@@ -33,7 +32,7 @@ export function LoginForm() {
     defaultValues: { email: "", password: "", remember: true },
   });
 
-  const from = (location.state as RedirectLocationState | null)?.from?.pathname ?? getLoggedInLandingRoute();
+  const from = (location.state as RedirectLocationState | null)?.from?.pathname ?? routes.dashboard;
   const onSubmit = handleSubmit((values) => {
     login(values.email);
     navigate(from, { replace: true });
@@ -41,7 +40,7 @@ export function LoginForm() {
 
   const handleSocialLogin = () => {
     login("security.admin@moroai.com");
-    navigate(getLoggedInLandingRoute(), { replace: true });
+    navigate(routes.dashboard, { replace: true });
   };
 
   return (

@@ -14,11 +14,27 @@ interface PendingRegistration {
 
 interface AuthState {
   user: AuthUser | null;
+  token: string | null;
+  isAuthenticated: boolean;
   pendingRegistration: PendingRegistration | null;
-  login: (email: string) => void;
+  login: (email?: string) => void;
   prepareRegistration: (registration: PendingRegistration) => void;
   completeRegistration: () => void;
   logout: () => void;
+}
+
+const authTokenKey = "moroai-auth-token";
+
+function createAuthToken() {
+  return `moroai_${crypto.randomUUID()}`;
+}
+
+function storeAuthToken(token: string) {
+  localStorage.setItem(authTokenKey, token);
+}
+
+function clearAuthToken() {
+  localStorage.removeItem(authTokenKey);
 }
 
 function getNameFromEmail(email: string) {
@@ -34,16 +50,24 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      token: null,
+      isAuthenticated: false,
       pendingRegistration: null,
-      login: (email) =>
-        set({
+      login: (email = "security.admin@moroai.com") => {
+        const token = createAuthToken();
+        storeAuthToken(token);
+
+        return set({
+          token,
+          isAuthenticated: true,
           user: {
             id: crypto.randomUUID(),
             name: getNameFromEmail(email),
             email,
           },
           pendingRegistration: null,
-        }),
+        });
+      },
       prepareRegistration: (registration) => set({ pendingRegistration: registration }),
       completeRegistration: () => {
         const pendingRegistration = get().pendingRegistration;
@@ -52,7 +76,12 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
 
+        const token = createAuthToken();
+        storeAuthToken(token);
+
         set({
+          token,
+          isAuthenticated: true,
           user: {
             id: crypto.randomUUID(),
             name: pendingRegistration.name,
@@ -61,12 +90,17 @@ export const useAuthStore = create<AuthState>()(
           pendingRegistration: null,
         });
       },
-      logout: () => set({ user: null, pendingRegistration: null }),
+      logout: () => {
+        clearAuthToken();
+        set({ user: null, token: null, isAuthenticated: false, pendingRegistration: null });
+      },
     }),
     {
       name: "moroai-auth",
       partialize: (state) => ({
         user: state.user,
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
         pendingRegistration: state.pendingRegistration,
       }),
     },

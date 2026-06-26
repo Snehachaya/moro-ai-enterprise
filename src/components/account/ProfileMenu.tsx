@@ -195,7 +195,7 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
                 onClick={() => {
                   logout();
                   setIsOpen(false);
-                  navigate(routes.login, { replace: true });
+                  navigate(routes.home, { replace: true });
                 }}
               >
                 <LogOut className="h-4 w-4" aria-hidden="true" />

@@ -1,10 +1,11 @@
-import { ArrowRight, Camera, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowRight, Camera, CheckCircle2, LayoutDashboard, LogIn, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { routes } from "@/routes/paths";
+import { useAuthStore } from "@/store/authStore";
 
 const featurePills = ["24/7 AI vigilance", "Threat recognition", "Instant alerts"];
 const feedCells = [
@@ -27,6 +28,8 @@ const telemetryRows = [
 ];
 
 export function Hero() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return (
     <section id="home" className="relative overflow-hidden px-4 pb-20 pt-14 sm:px-6 lg:px-8 lg:pb-28 lg:pt-20">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_18%,rgba(6,182,212,0.18),transparent_30rem),radial-gradient(circle_at_86%_16%,rgba(99,102,241,0.16),transparent_28rem)]" />
@@ -60,15 +63,25 @@ export function Hero() {
             ))}
           </div>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link to={routes.register}>
+            <Link to={isAuthenticated ? routes.dashboard : routes.register}>
               <Button size="lg" className="w-full sm:w-auto">
-                Request System Demo
+                {isAuthenticated ? "Open Dashboard" : "Request System Demo"}
                 <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </Button>
             </Link>
-            <Link to={routes.login}>
+            <Link to={isAuthenticated ? routes.dashboard : routes.login}>
               <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                Login
+                {isAuthenticated ? (
+                  <>
+                    <LayoutDashboard className="h-5 w-5" aria-hidden="true" />
+                    Dashboard
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="h-5 w-5" aria-hidden="true" />
+                    Login
+                  </>
+                )}
               </Button>
             </Link>
           </div>
