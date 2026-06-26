@@ -28,14 +28,6 @@ export interface BillingSummary {
   invoices: Invoice[];
 }
 
-export const accountProfile: AccountProfile = {
-  fullName: "Mahesh Kumar",
-  email: "mahesh.k@moroai.systems",
-  phone: "+91 98765 43210",
-  role: "Senior Operator",
-  workspace: "Enterprise Workspace (Systems Group)",
-};
-
 export const purchasedModules: PurchasedModule[] = [
   { id: "human", name: "Human Detection", status: "Active", usage: 86, expires: "Dec 2024" },
   { id: "object", name: "Object Detection", status: "Active", usage: 92, expires: "Dec 2024" },

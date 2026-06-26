@@ -34,7 +34,7 @@ export function RegisterForm() {
   });
 
   const handleSocialRegistration = () => {
-    login("security.admin@moroai.com");
+    login();
     navigate(routes.welcome, { replace: true });
   };
 

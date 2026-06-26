@@ -45,7 +45,7 @@ export function OTPForm() {
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">Enter security code</h1>
         <p className="mt-2 text-sm leading-6 text-slate-400">
           We sent a six digit code to{" "}
-          <span className="text-slate-200">{pendingRegistration?.email ?? "security.admin@moroai.com"}</span>.
+          <span className="text-slate-200">{pendingRegistration?.email ?? "your registered email"}</span>.
         </p>
       </div>
 

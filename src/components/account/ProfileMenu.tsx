@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { accountProfile, purchasedModules } from "@/data/account";
+import { purchasedModules } from "@/data/account";
 import { routes } from "@/routes/paths";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
@@ -31,6 +31,18 @@ const quickActions = [
   { label: "Download Invoices", to: `${routes.account}?section=billing`, icon: Download },
 ];
 
+function getInitials(name: string, email: string) {
+  const source = name === "Complete profile" ? email : name;
+  const initials = source
+    .split(/[.\s_-]/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+
+  return initials || "--";
+}
+
 interface ProfileMenuProps {
   className?: string;
   variant?: "compact" | "avatar";
@@ -40,8 +52,11 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const user = useAuthStore((state) => state.user);
-  const displayName = user?.name ?? accountProfile.fullName;
-  const displayEmail = user?.email ?? accountProfile.email;
+  const profile = useAuthStore((state) => state.profile);
+  const displayName = profile?.fullName || user?.name || "Complete profile";
+  const displayEmail = profile?.email || user?.email || "No email saved";
+  const displayRole = profile?.role || "Profile pending";
+  const initials = getInitials(displayName, displayEmail);
   const activeModuleCount = purchasedModules.length;
 
   useEffect(() => {
@@ -86,7 +101,7 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
         {variant === "avatar" ? (
           <>
             <span className="absolute inset-0 bg-[radial-gradient(circle_at_35%_20%,rgba(6,182,212,0.55),transparent_38%),linear-gradient(135deg,#0f172a,#020817)]" />
-            <span className="relative text-xs font-bold text-white">MK</span>
+            <span className="relative text-xs font-bold text-white">{initials}</span>
             <span className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border border-slate-950 bg-emerald-400" />
           </>
         ) : (
@@ -108,7 +123,7 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
                 <div className="relative h-14 w-14 overflow-hidden rounded-xl border border-cyan-300/30 bg-[radial-gradient(circle_at_35%_20%,rgba(6,182,212,0.55),transparent_38%),linear-gradient(135deg,#0f172a,#020817)]">
                   <span className="absolute inset-x-0 bottom-0 h-7 bg-gradient-to-t from-cyan-400/20 to-transparent" />
                   <span className="absolute bottom-2 left-1/2 flex h-7 w-7 -translate-x-1/2 items-center justify-center rounded-full bg-slate-950 text-[10px] font-bold text-white">
-                    MK
+                    {initials}
                   </span>
                   <span className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border border-slate-950 bg-emerald-400" />
                 </div>
@@ -116,7 +131,7 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
                   <p className="truncate text-sm font-semibold text-white">{displayName}</p>
                   <p className="truncate text-xs text-slate-400">{displayEmail}</p>
                   <Badge variant="accent" className="mt-2 h-6 rounded-md px-2 text-[10px] uppercase tracking-wider">
-                    Administrator
+                    {displayRole}
                   </Badge>
                 </div>
               </div>

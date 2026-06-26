@@ -7,6 +7,14 @@ export interface AuthUser {
   email: string;
 }
 
+export interface UserProfile {
+  fullName: string;
+  email: string;
+  phone: string;
+  role: string;
+  workspace: string;
+}
+
 interface PendingRegistration {
   name: string;
   email: string;
@@ -17,9 +25,11 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   pendingRegistration: PendingRegistration | null;
+  profile: UserProfile | null;
   login: (email?: string) => void;
   prepareRegistration: (registration: PendingRegistration) => void;
   completeRegistration: () => void;
+  updateProfile: (profile: UserProfile) => void;
   logout: () => void;
 }
 
@@ -53,18 +63,21 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       pendingRegistration: null,
-      login: (email = "security.admin@moroai.com") => {
+      profile: null,
+      login: (email = "") => {
         const token = createAuthToken();
         storeAuthToken(token);
 
         return set({
           token,
           isAuthenticated: true,
-          user: {
-            id: crypto.randomUUID(),
-            name: getNameFromEmail(email),
-            email,
-          },
+          user: email
+            ? {
+                id: crypto.randomUUID(),
+                name: getNameFromEmail(email),
+                email,
+              }
+            : null,
           pendingRegistration: null,
         });
       },
@@ -90,9 +103,10 @@ export const useAuthStore = create<AuthState>()(
           pendingRegistration: null,
         });
       },
+      updateProfile: (profile) => set({ profile }),
       logout: () => {
         clearAuthToken();
-        set({ user: null, token: null, isAuthenticated: false, pendingRegistration: null });
+        set({ user: null, token: null, isAuthenticated: false, pendingRegistration: null, profile: null });
       },
     }),
     {
@@ -102,6 +116,7 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
         pendingRegistration: state.pendingRegistration,
+        profile: state.profile,
       }),
     },
   ),

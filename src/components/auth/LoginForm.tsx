@@ -39,7 +39,7 @@ export function LoginForm() {
   });
 
   const handleSocialLogin = () => {
-    login("security.admin@moroai.com");
+    login();
     navigate(routes.dashboard, { replace: true });
   };
 

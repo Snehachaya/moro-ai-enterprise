@@ -12,6 +12,7 @@ export function DashboardLayout() {
   const navigate = useNavigate();
   const navigation = [...primaryNavigation, ...accountNavigation];
   const user = useAuthStore((state) => state.user);
+  const profile = useAuthStore((state) => state.profile);
   const logout = useAuthStore((state) => state.logout);
 
   return (
@@ -55,8 +56,8 @@ export function DashboardLayout() {
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-medium text-white">{user?.name ?? "MoroAI User"}</p>
-              <p className="text-xs text-slate-500">{user?.email ?? "Authenticated"}</p>
+              <p className="text-sm font-medium text-white">{profile?.fullName || user?.name || "MoroAI User"}</p>
+              <p className="text-xs text-slate-500">{profile?.email || user?.email || "Authenticated"}</p>
             </div>
             <Button variant="secondary" size="sm" aria-label="Notifications">
               <Bell className="h-4 w-4" aria-hidden="true" />

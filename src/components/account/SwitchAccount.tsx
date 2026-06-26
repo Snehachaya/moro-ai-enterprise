@@ -2,13 +2,13 @@ import { LogOut, Network, ShieldAlert, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { accountProfile } from "@/data/account";
 import { routes } from "@/routes/paths";
 import { useAuthStore } from "@/store/authStore";
 
 export function SwitchAccount() {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
+  const profile = useAuthStore((state) => state.profile);
 
   return (
     <section className="space-y-16">
@@ -20,7 +20,7 @@ export function SwitchAccount() {
             </span>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Current Active Account</p>
-              <h3 className="mt-2 text-lg font-medium text-white">{accountProfile.workspace}</h3>
+              <h3 className="mt-2 text-lg font-medium text-white">{profile?.workspace || "Workspace not configured"}</h3>
             </div>
           </div>
           <Button variant="secondary" className="justify-center px-8">
