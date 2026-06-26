@@ -1,4 +1,4 @@
-import { ArrowRight, Camera, CheckCircle2, LayoutDashboard, LogIn, ShieldCheck } from "lucide-react";
+import { ArrowRight, Camera, CheckCircle2, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/Badge";
@@ -63,25 +63,10 @@ export function Hero() {
             ))}
           </div>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link to={isAuthenticated ? routes.dashboard : routes.register}>
+            <Link to={isAuthenticated ? routes.marketplace : routes.register}>
               <Button size="lg" className="w-full sm:w-auto">
-                {isAuthenticated ? "Open Dashboard" : "Request System Demo"}
+                {isAuthenticated ? "Explore Modules" : "Request System Demo"}
                 <ArrowRight className="h-5 w-5" aria-hidden="true" />
-              </Button>
-            </Link>
-            <Link to={isAuthenticated ? routes.dashboard : routes.login}>
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                {isAuthenticated ? (
-                  <>
-                    <LayoutDashboard className="h-5 w-5" aria-hidden="true" />
-                    Dashboard
-                  </>
-                ) : (
-                  <>
-                    <LogIn className="h-5 w-5" aria-hidden="true" />
-                    Login
-                  </>
-                )}
               </Button>
             </Link>
           </div>
