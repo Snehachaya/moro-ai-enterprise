@@ -18,38 +18,44 @@ interface ModuleHeroProps {
   module: DetectionModule;
 }
 
+function ModuleHeroContent({ module }: ModuleHeroProps) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+      <Badge variant="accent" className="gap-2">
+        <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+        AI Active
+      </Badge>
+      <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white lg:text-5xl">{module.title}</h1>
+      <p className="mt-5 max-w-2xl text-base leading-7 text-slate-400">{module.description}</p>
+      <div className="mt-7 flex flex-wrap gap-3">
+        {module.capabilities.map((capability) => (
+          <span
+            key={capability}
+            className="inline-flex items-center gap-2 rounded-full border border-borderSubtle bg-white/[0.04] px-4 py-2 text-sm text-slate-300"
+          >
+            <CheckCircle2 className="h-4 w-4 text-accent" aria-hidden="true" />
+            {capability}
+          </span>
+        ))}
+      </div>
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <Button size="lg">
+          Activate Module
+          <ArrowRight className="h-5 w-5" aria-hidden="true" />
+        </Button>
+        <Button variant="secondary" size="lg">
+          View Evidence Demo
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
+
 export function ModuleHero({ module }: ModuleHeroProps) {
   if (module.id === "human") {
     return (
       <section className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)] lg:items-center">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <Badge variant="accent" className="gap-2">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            AI Active
-          </Badge>
-          <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white lg:text-5xl">{module.title}</h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-slate-400">{module.description}</p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            {module.capabilities.map((capability) => (
-              <span
-                key={capability}
-                className="inline-flex items-center gap-2 rounded-full border border-borderSubtle bg-white/[0.04] px-4 py-2 text-sm text-slate-300"
-              >
-                <CheckCircle2 className="h-4 w-4 text-accent" aria-hidden="true" />
-                {capability}
-              </span>
-            ))}
-          </div>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button size="lg">
-              Activate Module
-              <ArrowRight className="h-5 w-5" aria-hidden="true" />
-            </Button>
-            <Button variant="secondary" size="lg">
-              View Evidence Demo
-            </Button>
-          </div>
-        </motion.div>
+        <ModuleHeroContent module={module} />
 
         <motion.div
           initial={{ opacity: 0, scale: 0.98, y: 16 }}
@@ -109,6 +115,60 @@ export function ModuleHero({ module }: ModuleHeroProps) {
     );
   }
 
+  if (module.id === "object") {
+    return (
+      <section className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)] lg:items-center">
+        <ModuleHeroContent module={module} />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.06, duration: 0.32 }}
+        >
+          <Card className="overflow-hidden border-cyan-300/25 bg-[#061315] p-1 shadow-[0_0_70px_rgba(6,182,212,0.14)]">
+            <div className="relative min-h-[420px] overflow-hidden rounded-xl border border-cyan-300/20 bg-[#071314]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(6,182,212,0.22),transparent_17rem),linear-gradient(90deg,rgba(2,8,23,0.76),transparent_20%,transparent_80%,rgba(2,8,23,0.76))]" />
+
+              <div className="absolute bottom-0 left-1/2 h-24 w-[92%] -translate-x-1/2 rounded-t-[50%] border-t border-cyan-300/25 bg-cyan-300/10 shadow-[0_-18px_36px_rgba(6,182,212,0.12)]" />
+              <div className="absolute bottom-0 left-1/2 h-10 w-[84%] -translate-x-1/2 rounded-t-[50%] bg-slate-950/70" />
+
+              <div className="absolute left-1/2 top-0 h-[330px] w-[74%] -translate-x-1/2 rounded-b-3xl border-x-2 border-b-2 border-cyan-300/35 bg-[#071a1c]/80 shadow-[0_0_38px_rgba(6,182,212,0.18)]">
+                <div className="absolute inset-x-5 top-7 h-[245px] overflow-hidden rounded-sm border border-cyan-300/25 bg-[#0a1718]">
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,182,212,0.32),rgba(2,8,23,0.62)),radial-gradient(circle_at_50%_72%,rgba(6,182,212,0.16),transparent_8rem)]" />
+                  <div className="absolute inset-x-[27%] top-0 h-28 border-x border-cyan-100/25 bg-cyan-100/18" />
+                  <div className="absolute left-[22%] top-[44%] h-20 w-6 rounded-full bg-slate-950 shadow-[0_0_20px_rgba(2,8,23,0.8)]" />
+                  <div className="absolute left-[18%] top-[62%] h-8 w-14 border-t border-cyan-100/20" />
+                  <div className="absolute left-[39%] top-[56%] h-20 w-36 rounded-sm border-t-2 border-cyan-100/18 bg-slate-950/45" />
+                  <div className="absolute left-[47%] top-[50%] h-9 w-16 rounded-sm border border-cyan-300/30 bg-black/55" />
+                  <div className="absolute left-[12%] top-[60%] h-20 w-20 rounded-sm border border-cyan-300/25" />
+                  <div className="absolute right-[10%] top-[58%] h-24 w-20 rounded-sm border border-cyan-300/25" />
+                  <div className="absolute inset-x-0 bottom-0 h-14 bg-[linear-gradient(8deg,transparent_48%,rgba(34,211,238,0.18)_49%,transparent_51%),linear-gradient(172deg,transparent_48%,rgba(34,211,238,0.14)_49%,transparent_51%)]" />
+
+                  <div className="absolute left-[10%] top-[18%] h-32 w-40 border-2 border-cyan-300 shadow-glow">
+                    <span className="absolute -left-1 -top-8 bg-cyan-300 px-3 py-2 font-mono text-sm font-semibold text-slate-950">
+                      Laptop 98%
+                    </span>
+                  </div>
+                  <div className="absolute left-[8%] top-[58%] h-16 w-24 border border-cyan-300/35" />
+                  <div className="absolute right-[8%] top-[54%] h-20 w-28 border border-cyan-300/35" />
+                </div>
+
+                <div className="absolute inset-x-8 top-2 flex items-center justify-between text-[8px] uppercase tracking-[0.22em] text-cyan-100/35">
+                  <span>object_channel</span>
+                  <span>asset tracking</span>
+                  <span>98.7 fps</span>
+                </div>
+                <div className="absolute bottom-3 right-8 text-[8px] uppercase tracking-[0.18em] text-cyan-100/45">
+                  confidence: 0.98
+                </div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      </section>
+    );
+  }
+
   if (module.id === "threat") {
     return (
       <section className="rounded-none border border-dashed border-cyan-300/40 bg-[#0b0f16]/80 px-6 py-14 text-center shadow-[0_0_36px_rgba(6,182,212,0.08)]">
@@ -149,34 +209,7 @@ export function ModuleHero({ module }: ModuleHeroProps) {
 
   return (
     <section className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] lg:items-center">
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-        <Badge variant="accent" className="gap-2">
-          <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-          AI Active
-        </Badge>
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white lg:text-5xl">{module.title}</h1>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-slate-400">{module.description}</p>
-        <div className="mt-7 flex flex-wrap gap-3">
-          {module.capabilities.map((capability) => (
-            <span
-              key={capability}
-              className="inline-flex items-center gap-2 rounded-full border border-borderSubtle bg-white/[0.04] px-4 py-2 text-sm text-slate-300"
-            >
-              <CheckCircle2 className="h-4 w-4 text-accent" aria-hidden="true" />
-              {capability}
-            </span>
-          ))}
-        </div>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button size="lg">
-            Activate Module
-            <ArrowRight className="h-5 w-5" aria-hidden="true" />
-          </Button>
-          <Button variant="secondary" size="lg">
-            View Evidence Demo
-          </Button>
-        </div>
-      </motion.div>
+      <ModuleHeroContent module={module} />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.98, y: 16 }}
