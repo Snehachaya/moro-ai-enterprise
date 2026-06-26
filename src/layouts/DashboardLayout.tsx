@@ -1,15 +1,18 @@
-import { NavLink, Outlet } from "react-router-dom";
-import { Bell, Menu, Search } from "lucide-react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Bell, LogOut, Menu, Search } from "lucide-react";
 import { AppLogo } from "@/components/common/AppLogo";
 import { ProfileMenu } from "@/components/account/ProfileMenu";
 import { Button } from "@/components/ui/Button";
 import { primaryNavigation, accountNavigation } from "@/data/navigation";
+import { routes } from "@/routes/paths";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
 
 export function DashboardLayout() {
+  const navigate = useNavigate();
   const navigation = [...primaryNavigation, ...accountNavigation];
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
 
   return (
     <div className="min-h-screen bg-background text-slate-100">
@@ -59,6 +62,17 @@ export function DashboardLayout() {
               <Bell className="h-4 w-4" aria-hidden="true" />
             </Button>
             <ProfileMenu variant="avatar" />
+            <Button
+              variant="secondary"
+              size="sm"
+              aria-label="Logout"
+              onClick={() => {
+                logout();
+                navigate(routes.home, { replace: true });
+              }}
+            >
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+            </Button>
           </div>
         </header>
 
