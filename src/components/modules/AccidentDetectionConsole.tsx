@@ -122,8 +122,23 @@ export function AccidentDetectionConsole() {
     const session = sessionRef.current + 1; sessionRef.current = session;
     setStatus("loading"); setError(""); setVehicles([]); setAlertActive(false);
     try {
+      const video = videoRef.current;
+      if (!video) throw new Error("Video preview is unavailable.");
+      video.pause();
       const [model, sceneModel] = await Promise.all([loadAccidentModel(), loadSceneModel()]);
       if (sessionRef.current !== session) return;
+      if (video.readyState < HTMLMediaElement.HAVE_METADATA) {
+        await new Promise<void>((resolve, reject) => {
+          const ready = () => { cleanup(); resolve(); };
+          const failed = () => { cleanup(); reject(new Error("The selected video could not be prepared for analysis.")); };
+          const cleanup = () => { video.removeEventListener("loadedmetadata", ready); video.removeEventListener("error", failed); };
+          video.addEventListener("loadedmetadata", ready, { once: true });
+          video.addEventListener("error", failed, { once: true });
+        });
+      }
+      if (sessionRef.current !== session) return;
+      if (activeSource === "video") video.currentTime = 0;
+      await video.play();
       setStatus("live");
       const analysisCanvas = document.createElement("canvas"); analysisCanvas.width = 320; analysisCanvas.height = 180;
       const classifierCanvas = document.createElement("canvas"); classifierCanvas.width = 16; classifierCanvas.height = 16;
@@ -182,7 +197,7 @@ export function AccidentDetectionConsole() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: selected }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
       streamRef.current = stream; const video = videoRef.current; if (!video) throw new Error("Camera preview is unavailable.");
-      video.srcObject = stream; await video.play(); await analyze("camera");
+      video.srcObject = stream; await analyze("camera");
     } catch (cause) { setStatus("error"); setError(cameraMessage(cause)); }
   }
 
@@ -190,7 +205,7 @@ export function AccidentDetectionConsole() {
     const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
     stop(); setSource("video"); objectUrlRef.current = URL.createObjectURL(file);
     const video = videoRef.current; if (!video) return;
-    video.src = objectUrlRef.current; video.loop = true; await video.play(); await analyze("video");
+    video.src = objectUrlRef.current; video.loop = true; video.load(); await analyze("video");
   }
 
   function switchCamera() {
@@ -202,7 +217,7 @@ export function AccidentDetectionConsole() {
 
   const width = 320; const height = 180;
   return <section className="space-y-6"><div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><Badge variant={alertActive ? "warning" : "success"}>{alertActive ? "Possible accident" : "Monitoring ready"}</Badge><h2 className="mt-4 text-3xl font-semibold text-white">Browser accident detection</h2><p className="mt-2 text-sm text-slate-400">Adapted from the supplied vehicle, motion, proximity, and impact-detection pipeline.</p></div><div className="flex flex-wrap gap-2"><Button variant="secondary" onClick={switchCamera}><RefreshCw className="h-4 w-4" />{facingMode === "environment" ? "Use front camera" : "Use rear camera"}</Button><label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white hover:bg-white/10"><FileVideo className="h-4 w-4" />Analyze video<input className="sr-only" type="file" accept="video/*" onChange={(event) => void openVideo(event)} /></label>{status === "idle" || status === "error" ? <Button onClick={() => void startCamera()}><Camera className="h-4 w-4" />Open camera</Button> : <Button variant="danger" onClick={stop}><StopCircle className="h-4 w-4" />Stop</Button>}</div></div>
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]"><Card className="overflow-hidden p-0"><div className={`relative aspect-video bg-black ${alertActive ? "ring-4 ring-rose-500/80" : ""}`}><video ref={videoRef} muted autoPlay playsInline className="h-full w-full object-contain" />{vehicles.map((vehicle, index) => { const [x,y,w,h]=vehicle.bbox; return <div key={`${vehicle.class}-${index}`} className="absolute border-2 border-emerald-300" style={{left:`${x/width*100}%`,top:`${y/height*100}%`,width:`${w/width*100}%`,height:`${h/height*100}%`}}><span className="absolute -top-7 left-0 bg-emerald-300 px-2 py-1 font-mono text-xs font-bold text-slate-950">{vehicle.class} {Math.round(vehicle.score*100)}%</span></div>; })}{alertActive ? <div className="absolute inset-0 flex items-center justify-center bg-rose-950/35"><div className="rounded-xl border border-rose-300 bg-rose-600/90 px-6 py-4 text-center shadow-2xl"><AlertTriangle className="mx-auto h-8 w-8" /><p className="mt-2 font-bold uppercase tracking-wider">Possible accident detected</p></div></div> : null}{["requesting","loading"].includes(status) ? <div className="absolute inset-0 flex items-center justify-center bg-slate-950/85"><Loader2 className="h-8 w-8 animate-spin text-emerald-200" /><p className="ml-3 text-sm text-slate-200">{status === "requesting" ? "Waiting for camera permission..." : "Loading accident model..."}</p></div> : null}</div></Card>
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]"><Card className="overflow-hidden p-0"><div className={`relative aspect-video bg-black ${alertActive ? "ring-4 ring-rose-500/80" : ""}`}><video ref={videoRef} muted playsInline className="h-full w-full object-contain" />{vehicles.map((vehicle, index) => { const [x,y,w,h]=vehicle.bbox; return <div key={`${vehicle.class}-${index}`} className="absolute border-2 border-emerald-300" style={{left:`${x/width*100}%`,top:`${y/height*100}%`,width:`${w/width*100}%`,height:`${h/height*100}%`}}><span className="absolute -top-7 left-0 bg-emerald-300 px-2 py-1 font-mono text-xs font-bold text-slate-950">{vehicle.class} {Math.round(vehicle.score*100)}%</span></div>; })}{alertActive ? <div className="absolute inset-0 flex items-center justify-center bg-rose-950/35"><div className="rounded-xl border border-rose-300 bg-rose-600/90 px-6 py-4 text-center shadow-2xl"><AlertTriangle className="mx-auto h-8 w-8" /><p className="mt-2 font-bold uppercase tracking-wider">Possible accident detected</p></div></div> : null}{["requesting","loading"].includes(status) ? <div className="absolute inset-0 flex items-center justify-center bg-slate-950/85"><Loader2 className="h-8 w-8 animate-spin text-emerald-200" /><p className="ml-3 text-sm text-slate-200">{status === "requesting" ? "Waiting for camera permission..." : "Preparing both detection models · video paused..."}</p></div> : null}</div></Card>
       <Card><CardContent><h3 className="font-semibold text-white">Live risk analysis</h3><div className="mt-4 grid grid-cols-2 gap-2"><div className="rounded-xl bg-white/5 p-3 text-center"><p className="text-2xl font-semibold text-white">{vehicles.length}</p><p className="text-[10px] uppercase text-slate-500">Vehicles</p></div><div className="rounded-xl bg-white/5 p-3 text-center"><p className="text-2xl font-semibold text-white">{motionScore}</p><p className="text-[10px] uppercase text-slate-500">Motion</p></div><div className="rounded-xl bg-cyan-400/10 p-3 text-center"><p className="text-2xl font-semibold text-white">{modelScore}%</p><p className="text-[10px] uppercase text-slate-500">Trained model</p></div><div className={`rounded-xl p-3 text-center ${riskScore > 70 ? "bg-rose-400/15" : "bg-emerald-400/10"}`}><p className="text-2xl font-semibold text-white">{riskScore}%</p><p className="text-[10px] uppercase text-slate-500">Combined risk</p></div></div><p className="mt-4 text-xs leading-5 text-slate-500">Source: {source}. The trained accident classifier is the primary signal; motion, vehicle proximity, and consecutive-frame confirmation reduce false alarms.</p>{error ? <p className="mt-4 rounded-lg border border-rose-300/20 bg-rose-400/10 p-3 text-sm text-rose-200">{error}</p> : null}<h3 className="mt-6 font-semibold text-white">Recent incidents</h3><div className="mt-3 space-y-2">{incidents.map((incident) => <div key={incident.id} className="flex items-center justify-between rounded-lg border border-rose-300/15 bg-rose-400/5 p-3 text-sm"><span className="text-slate-300">{incident.time} · {incident.source}</span><Badge variant="warning">{incident.risk}%</Badge></div>)}{incidents.length === 0 ? <p className="rounded-lg border border-dashed border-white/10 p-4 text-center text-xs text-slate-500">No accident events in this session.</p> : null}</div></CardContent></Card></div>
   </section>;
 }
