@@ -16,7 +16,10 @@ export function ModulePlanCard({ module }: ModulePlanCardProps) {
   const selectedIds = useSubscriptionStore((state) => state.selectedIds);
   const addModule = useSubscriptionStore((state) => state.addModule);
   const toggleModule = useSubscriptionStore((state) => state.toggleModule);
+  const subscribedIds = useSubscriptionStore((state) => state.subscribedIds);
+  const subscribe = useSubscriptionStore((state) => state.subscribe);
   const isSelected = selectedIds.includes(module.id);
+  const isSubscribed = subscribedIds.includes(module.id);
   const Icon = module.icon;
 
   return (
@@ -59,12 +62,12 @@ export function ModulePlanCard({ module }: ModulePlanCardProps) {
               <p className="text-2xl font-semibold text-white">₹{module.price.toLocaleString("en-IN")}</p>
               <p className="text-xs text-slate-500">per {module.billingCycle}</p>
             </div>
-            {isSelected ? <Badge variant="success">Selected</Badge> : null}
+            {isSubscribed ? <Badge variant="success">Subscribed</Badge> : isSelected ? <Badge variant="success">Selected</Badge> : null}
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <Button type="button" onClick={() => addModule(module.id)}>
-              Subscribe
+            <Button type="button" disabled={isSubscribed} onClick={() => { addModule(module.id); subscribe(module.id); }}>
+              {isSubscribed ? "Active" : "Subscribe"}
             </Button>
             <Button type="button" variant="secondary" onClick={() => toggleModule(module.id)}>
               <ShoppingCart className="h-4 w-4" aria-hidden="true" />

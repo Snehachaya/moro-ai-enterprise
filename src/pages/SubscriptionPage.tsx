@@ -16,8 +16,10 @@ export function SubscriptionPage() {
   const selectedIds = useSubscriptionStore((state) => state.selectedIds);
   const removeModule = useSubscriptionStore((state) => state.removeModule);
   const selectedModules = getSelectedModules(selectedIds);
+  const subscribedIds = useSubscriptionStore((state) => state.subscribedIds);
+  const subscribeSelected = useSubscriptionStore((state) => state.subscribeSelected);
   const activeModuleIds = new Set(purchasedModules.map((module) => `${module.id}-detection`));
-  const activeModules = marketplaceModules.filter((module) => activeModuleIds.has(module.id));
+  const activeModules = marketplaceModules.filter((module) => activeModuleIds.has(module.id) || subscribedIds.includes(module.id));
   const isCheckoutMode = selectedModules.length > 0;
   const displayedModules = isCheckoutMode ? selectedModules : activeModules;
   const total = isCheckoutMode ? getSubscriptionTotal(selectedModules) : 1240;
@@ -125,14 +127,14 @@ export function SubscriptionPage() {
                 <div className="border-t border-borderSubtle pt-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-slate-400">Modules active</span>
-                    <span className="text-3xl font-semibold text-white">{activeModules.length} / 5</span>
+                    <span className="text-3xl font-semibold text-white">{activeModules.length} / 6</span>
                   </div>
                 </div>
               )}
             </div>
 
             {isCheckoutMode ? (
-              <Button className="w-full" size="lg">
+              <Button className="w-full" size="lg" onClick={subscribeSelected}>
                 <CreditCard className="h-5 w-5" aria-hidden="true" />
                 Proceed to payment
               </Button>

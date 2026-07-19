@@ -16,6 +16,8 @@ import { RequireAuth } from "@/routes/RequireAuth";
 import { SubscriptionPage } from "@/pages/SubscriptionPage";
 import { VerifyOTPPage } from "@/pages/VerifyOTPPage";
 import { WelcomePage } from "@/pages/WelcomePage";
+import { AssetRegistrationPage } from "@/pages/AssetRegistrationPage";
+import { LiveObjectDetectionPage } from "@/pages/LiveObjectDetectionPage";
 import { routes } from "@/routes/paths";
 
 export const router = createBrowserRouter(
@@ -66,6 +68,8 @@ export const router = createBrowserRouter(
             { path: routes.humanDetection, element: <ModuleDetailPage module={moduleById.human} /> },
             { path: routes.objectDetection, element: <ModuleDetailPage module={moduleById.object} /> },
             { path: routes.assetOwnerIdentification, element: <ModuleDetailPage module={moduleById.owner} /> },
+            { path: routes.assetRegistration, element: <AssetRegistrationPage /> },
+            { path: routes.liveObjectDetection, element: <LiveObjectDetectionPage /> },
             { path: routes.threatDetection, element: <ModuleDetailPage module={moduleById.threat} /> },
             { path: routes.weaponDetection, element: <ModuleDetailPage module={moduleById.weapon} /> },
             { path: routes.accidentDetection, element: <ModuleDetailPage module={moduleById.accident} /> },

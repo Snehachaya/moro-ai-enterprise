@@ -18,6 +18,8 @@ export const routes = {
   humanDetection: "/modules/human-detection",
   objectDetection: "/modules/object-detection",
   assetOwnerIdentification: "/modules/asset-owner-identification",
+  assetRegistration: "/modules/asset-owner-identification/register",
+  liveObjectDetection: "/modules/asset-owner-identification/live",
   threatDetection: "/modules/threat-detection",
   weaponDetection: "/modules/weapon-detection",
   accidentDetection: "/modules/accident-detection",

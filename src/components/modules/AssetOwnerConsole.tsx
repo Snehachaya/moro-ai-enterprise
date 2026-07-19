@@ -1,6 +1,10 @@
-import { AlertTriangle, Camera, CheckCircle2, Database, Fingerprint, ScanLine, UserCheck } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, CreditCard, Database, Fingerprint, ScanLine, UserCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { routes } from "@/routes/paths";
+import { useSubscriptionStore } from "@/store/subscriptionStore";
 
 const registry = [
   { asset: "Dell Latitude 7440", id: "LAP-2048", owner: "Mahesh R.", department: "Engineering", images: 14, status: "Verified" },
@@ -15,6 +19,13 @@ const events = [
 ];
 
 export function AssetOwnerConsole() {
+  const subscribed = useSubscriptionStore((state) => state.subscribedIds.includes("asset-owner-identification"));
+  const subscribe = useSubscriptionStore((state) => state.subscribe);
+
+  if (!subscribed) {
+    return <section className="rounded-2xl border border-cyan-300/25 bg-gradient-to-br from-cyan-400/10 to-slate-950 p-8 text-center"><CreditCard className="mx-auto h-9 w-9 text-cyan-200" /><Badge variant="accent" className="mt-5">Subscription required</Badge><h2 className="mt-4 text-3xl font-semibold text-white">Activate the owner-identification workspace</h2><p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400">Subscribe while logged in to unlock browser webcam detection, device-local asset registration, and owner-aware detection overlays.</p><div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Button size="lg" onClick={()=>subscribe("asset-owner-identification")}>Subscribe for ₹449/month</Button><Link to={routes.marketplace}><Button variant="secondary" size="lg">View marketplace</Button></Link></div></section>;
+  }
+
   return (
     <section className="space-y-6" aria-labelledby="owner-console-title">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -23,9 +34,7 @@ export function AssetOwnerConsole() {
           <h2 id="owner-console-title" className="mt-4 text-3xl font-semibold tracking-tight text-white">Asset identity command center</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">Live view of registry coverage, owner matches, and assets that need enrollment.</p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-400/10 px-4 py-2 text-sm text-emerald-200">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" /> Python edge service connected
-        </div>
+        <div className="flex flex-wrap gap-3"><Link to={routes.liveObjectDetection}><Button><Camera className="h-4 w-4" />Open live detection</Button></Link><Link to={routes.assetRegistration}><Button variant="secondary"><Database className="h-4 w-4" />Register asset</Button></Link></div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
