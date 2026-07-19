@@ -24,6 +24,7 @@ export function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((state) => state.login);
+  const [serverError, setServerError] = useState("");
   const {
     register,
     handleSubmit,
@@ -33,15 +34,10 @@ export function LoginForm() {
   });
 
   const from = (location.state as RedirectLocationState | null)?.from?.pathname ?? routes.dashboard;
-  const onSubmit = handleSubmit((values) => {
-    login(values.email);
-    navigate(from, { replace: true });
+  const onSubmit = handleSubmit(async (values) => {
+    try { setServerError(""); await login(values.email, values.password); navigate(from, { replace: true }); }
+    catch (cause) { setServerError(cause instanceof Error ? cause.message : "Unable to sign in."); }
   });
-
-  const handleSocialLogin = () => {
-    login();
-    navigate(routes.dashboard, { replace: true });
-  };
 
   return (
     <form className="space-y-5 p-6 sm:p-8" onSubmit={onSubmit}>
@@ -103,20 +99,21 @@ export function LoginForm() {
         <Shield className="h-5 w-5" aria-hidden="true" />
         Sign in
       </Button>
+      {serverError ? <p className="rounded-lg border border-rose-300/20 bg-rose-400/10 p-3 text-sm text-rose-200">{serverError}</p> : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button variant="secondary" type="button" className="w-full" onClick={handleSocialLogin}>
+        <Button variant="secondary" type="button" className="w-full" disabled>
           <CircleUserRound className="h-4 w-4" aria-hidden="true" />
-          Google
+          Google SSO soon
         </Button>
-        <Button variant="secondary" type="button" className="w-full" onClick={handleSocialLogin}>
+        <Button variant="secondary" type="button" className="w-full" disabled>
           <span className="grid h-4 w-4 grid-cols-2 gap-0.5" aria-hidden="true">
             <span className="bg-cyan-300" />
             <span className="bg-sky-500" />
             <span className="bg-blue-400" />
             <span className="bg-indigo-400" />
           </span>
-          Microsoft
+          Microsoft SSO soon
         </Button>
       </div>
 
@@ -129,3 +126,4 @@ export function LoginForm() {
     </form>
   );
 }
+import { useState } from "react";

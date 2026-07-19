@@ -9,7 +9,10 @@ interface RequireAuthProps {
 
 export function RequireAuth({ children }: RequireAuthProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLoading = useAuthStore((state) => state.isLoading);
   const location = useLocation();
+
+  if (isLoading) return <div className="grid min-h-[50vh] place-items-center text-sm text-slate-400">Connecting to your secure workspace...</div>;
 
   if (!isAuthenticated) {
     return <Navigate to={routes.login} replace state={{ from: location }} />;

@@ -53,8 +53,8 @@ export function ProfileDetails() {
     reset(defaultValues);
   }, [defaultValues, reset]);
 
-  const onSubmit = handleSubmit((values) => {
-    updateProfile({
+  const onSubmit = handleSubmit(async (values) => {
+    await updateProfile({
       fullName: values.fullName.trim(),
       email: values.email.trim(),
       phone: values.phone.trim(),

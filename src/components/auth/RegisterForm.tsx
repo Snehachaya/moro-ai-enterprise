@@ -17,8 +17,9 @@ interface RegisterFormValues {
 
 export function RegisterForm() {
   const navigate = useNavigate();
-  const prepareRegistration = useAuthStore((state) => state.prepareRegistration);
-  const login = useAuthStore((state) => state.login);
+  const createAccount = useAuthStore((state) => state.register);
+  const [serverMessage, setServerMessage] = useState("");
+  const [serverError, setServerError] = useState("");
   const {
     register,
     handleSubmit,
@@ -28,15 +29,14 @@ export function RegisterForm() {
     defaultValues: { fullName: "", email: "", password: "", confirmPassword: "", terms: false },
   });
 
-  const onSubmit = handleSubmit((values) => {
-    prepareRegistration({ name: values.fullName, email: values.email });
-    navigate(routes.verify);
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      setServerError("");
+      const result = await createAccount(values.fullName, values.email, values.password);
+      if (result.needsEmailConfirmation) { setServerMessage("Account created. Check your email to confirm it, then sign in."); }
+      else navigate(routes.welcome, { replace: true });
+    } catch (cause) { setServerError(cause instanceof Error ? cause.message : "Unable to create account."); }
   });
-
-  const handleSocialRegistration = () => {
-    login();
-    navigate(routes.welcome, { replace: true });
-  };
 
   return (
     <form className="space-y-5 p-6 sm:p-8" onSubmit={onSubmit}>
@@ -113,20 +113,22 @@ export function RegisterForm() {
       <Button className="w-full" size="lg" type="submit" disabled={isSubmitting}>
         Create account
       </Button>
+      {serverMessage ? <p className="rounded-lg border border-emerald-300/20 bg-emerald-400/10 p-3 text-sm text-emerald-200">{serverMessage}</p> : null}
+      {serverError ? <p className="rounded-lg border border-rose-300/20 bg-rose-400/10 p-3 text-sm text-rose-200">{serverError}</p> : null}
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button variant="secondary" type="button" className="w-full" onClick={handleSocialRegistration}>
+        <Button variant="secondary" type="button" className="w-full" disabled>
           <CircleUserRound className="h-4 w-4" aria-hidden="true" />
-          Google
+          Google SSO soon
         </Button>
-        <Button variant="secondary" type="button" className="w-full" onClick={handleSocialRegistration}>
+        <Button variant="secondary" type="button" className="w-full" disabled>
           <span className="grid h-4 w-4 grid-cols-2 gap-0.5" aria-hidden="true">
             <span className="bg-cyan-300" />
             <span className="bg-sky-500" />
             <span className="bg-blue-400" />
             <span className="bg-indigo-400" />
           </span>
-          Microsoft
+          Microsoft SSO soon
         </Button>
       </div>
 
@@ -139,3 +141,4 @@ export function RegisterForm() {
     </form>
   );
 }
+import { useState } from "react";
