@@ -16,7 +16,6 @@ type CameraStatus = "idle" | "requesting" | "loading-model" | "live" | "camera-o
 const PERSON_MATCH_THRESHOLD = 0.42;
 const OBJECT_MATCH_THRESHOLD = 0.56;
 const MAX_DETECTIONS = 5;
-const STABLE_FRAME_COUNT = 3;
 
 function cameraErrorMessage(cause: unknown) {
   if (cause instanceof DOMException) {
@@ -74,12 +73,12 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
   const sessionRef = useRef(0);
   const matchesRef = useRef(new Map<string, OwnerMatch>());
   const pendingRef = useRef(new Set<string>());
-  const stableRef = useRef(new Map<string, number>());
   const lastOwnerScanRef = useRef(0);
   const lastOwnerMatchRef = useRef(new Map<string, number>());
   const [status, setStatus] = useState<CameraStatus>("idle");
   const [detections, setDetections] = useState<Detection[]>([]);
   const [error, setError] = useState("");
+  const [scanMessage, setScanMessage] = useState("");
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
 
   useEffect(() => () => {
@@ -90,8 +89,8 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
 
   async function start(selectedFacingMode = facingMode) {
     const session = sessionRef.current + 1; sessionRef.current = session;
-    setStatus("requesting"); setError(""); setDetections([]);
-    matchesRef.current.clear(); pendingRef.current.clear(); stableRef.current.clear(); lastOwnerMatchRef.current.clear();
+    setStatus("requesting"); setError(""); setScanMessage(""); setDetections([]);
+    matchesRef.current.clear(); pendingRef.current.clear(); lastOwnerMatchRef.current.clear();
     await useAssetRegistryStore.getState().syncAssets();
     if (!navigator.mediaDevices?.getUserMedia) { setStatus("idle"); setError("Camera access is not supported by this browser. Use Chrome, Edge, or Safari over HTTPS."); return; }
 
@@ -134,13 +133,11 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
             }
             inferenceCanvas.getContext("2d", { alpha: false })?.drawImage(video, 0, 0, inferenceWidth, inferenceHeight);
             const scaleX = sourceWidth / inferenceWidth; const scaleY = sourceHeight / inferenceHeight;
-            const predictions = await model.detect(inferenceCanvas, 15, 0.25);
+            const predictions = await model.detect(inferenceCanvas, 20, 0.05);
             const raw = predictions.map((result) => ({ ...result, bbox: [result.bbox[0] * scaleX, result.bbox[1] * scaleY, result.bbox[2] * scaleX, result.bbox[3] * scaleY] as [number, number, number, number] }));
             inferenceFailures = 0;
-            const activeClasses = new Set(raw.map((result) => result.class));
-            for (const className of activeClasses) stableRef.current.set(className, (stableRef.current.get(className) ?? 0) + 1);
-            for (const className of [...stableRef.current.keys()]) if (!activeClasses.has(className)) stableRef.current.set(className, 0);
-            const stable = raw.filter((result) => (stableRef.current.get(result.class) ?? 0) >= (mobileMode ? 2 : STABLE_FRAME_COUNT)).slice(0, maxDetections);
+            const stable = raw.sort((left, right) => right.score - left.score).slice(0, maxDetections);
+            setScanMessage(stable.length ? `${stable.length} prediction${stable.length === 1 ? "" : "s"} received from the camera.` : "AI is scanning frames, but no recognizable COCO object is visible yet.");
 
             const currentAssets = useAssetRegistryStore.getState().assets;
             const hasRegisteredReferences = currentAssets.some((asset) => asset.embeddings?.length || asset.embedding?.length);
@@ -196,6 +193,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
     streamRef.current?.getTracks().forEach((track) => track.stop()); streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
     setStatus("idle"); setDetections([]); setError("");
+    setScanMessage("");
   }
 
   function switchCamera() {
@@ -220,7 +218,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
         {detections.map((detection) => { const [x, y, w, h] = detection.bbox; const known = detection.owner.status === "Known"; return <div key={detection.key} className={`absolute border-2 ${detection.class === "person" ? "border-violet-300" : "border-cyan-300"}`} style={{ left: `${x / vw * 100}%`, top: `${y / vh * 100}%`, width: `${w / vw * 100}%`, height: `${h / vh * 100}%` }}><span className={`absolute -top-8 left-0 whitespace-nowrap px-2 py-1 font-mono text-xs font-semibold text-slate-950 ${detection.class === "person" ? "bg-violet-300" : "bg-cyan-300"}`}>{detection.class} {Math.round(detection.score * 100)}% · {known ? detection.owner.asset?.ownerName : detection.owner.status}</span></div>; })}
         <div className="absolute left-4 top-4"><Badge variant={status === "live" ? "success" : cameraOpen ? "accent" : "neutral"}>{status === "live" ? "AI live" : cameraOpen ? "Camera live" : status === "requesting" ? "Requesting access" : "Camera offline"}</Badge></div>
       </div></Card>
-      <Card><CardContent><div className="flex items-center gap-3"><ScanLine className="h-5 w-5 text-cyan-200" /><h2 className="font-semibold text-white">Current detections</h2></div><div className="mt-4 grid grid-cols-2 gap-3"><div className="rounded-xl border border-violet-300/20 bg-violet-400/10 p-3"><p className="text-2xl font-semibold text-white">{peopleCount}</p><p className="text-xs text-violet-200">People</p></div><div className="rounded-xl border border-cyan-300/20 bg-cyan-400/10 p-3"><p className="text-2xl font-semibold text-white">{objectCount}</p><p className="text-xs text-cyan-200">Objects</p></div></div><div className="mt-5 space-y-3">{detections.map((detection) => <div key={`${detection.key}-list`} className="rounded-xl border border-white/10 p-4"><div className="flex items-center justify-between"><p className="flex items-center gap-2 font-medium capitalize text-white">{detection.class === "person" ? <UserRound className="h-4 w-4 text-violet-200" /> : null}{detection.class}</p><Badge variant={detection.owner.status === "Known" ? "success" : detection.owner.status === "Identifying" ? "neutral" : "warning"}>{Math.round(detection.score * 100)}%</Badge></div><p className="mt-2 text-sm text-slate-400">{detection.owner.status === "Known" ? `${detection.owner.asset?.ownerName} · ${detection.owner.asset?.assetId}` : detection.owner.status === "Identifying" ? "Identifying owner..." : "Unregistered / unknown"}</p>{detection.owner.status !== "Identifying" ? <p className="mt-1 text-xs text-slate-500">Visual similarity {Math.round(detection.owner.similarity * 100)}%</p> : null}</div>)}{status === "live" && detections.length === 0 ? <p className="rounded-xl border border-dashed border-white/10 p-6 text-center text-sm text-slate-500">Point the camera at a person or common object. A detection appears after 3 stable frames.</p> : null}{status === "idle" ? <p className="rounded-xl border border-dashed border-white/10 p-6 text-center text-sm text-slate-500">Open the webcam to begin.</p> : null}</div>{error ? <p className="mt-4 rounded-lg border border-rose-300/20 bg-rose-400/10 p-3 text-sm text-rose-200">{error}</p> : null}</CardContent></Card>
+      <Card><CardContent><div className="flex items-center gap-3"><ScanLine className="h-5 w-5 text-cyan-200" /><h2 className="font-semibold text-white">Current detections</h2></div><div className="mt-4 grid grid-cols-2 gap-3"><div className="rounded-xl border border-violet-300/20 bg-violet-400/10 p-3"><p className="text-2xl font-semibold text-white">{peopleCount}</p><p className="text-xs text-violet-200">People</p></div><div className="rounded-xl border border-cyan-300/20 bg-cyan-400/10 p-3"><p className="text-2xl font-semibold text-white">{objectCount}</p><p className="text-xs text-cyan-200">Objects</p></div></div><div className="mt-5 space-y-3">{detections.map((detection) => <div key={`${detection.key}-list`} className="rounded-xl border border-white/10 p-4"><div className="flex items-center justify-between"><p className="flex items-center gap-2 font-medium capitalize text-white">{detection.class === "person" ? <UserRound className="h-4 w-4 text-violet-200" /> : null}{detection.class}</p><Badge variant={detection.owner.status === "Known" ? "success" : detection.owner.status === "Identifying" ? "neutral" : "warning"}>{Math.round(detection.score * 100)}%</Badge></div><p className="mt-2 text-sm text-slate-400">{detection.owner.status === "Known" ? `${detection.owner.asset?.ownerName} · ${detection.owner.asset?.assetId}` : detection.owner.status === "Identifying" ? "Identifying owner..." : "Unregistered / unknown"}</p>{detection.owner.status !== "Identifying" ? <p className="mt-1 text-xs text-slate-500">Visual similarity {Math.round(detection.owner.similarity * 100)}%</p> : null}</div>)}{status === "live" && detections.length === 0 ? <p className="rounded-xl border border-dashed border-white/10 p-6 text-center text-sm text-slate-500">{scanMessage || "Starting the first camera scan..."}</p> : null}{status === "idle" ? <p className="rounded-xl border border-dashed border-white/10 p-6 text-center text-sm text-slate-500">Open the webcam to begin.</p> : null}</div>{error ? <p className="mt-4 rounded-lg border border-rose-300/20 bg-rose-400/10 p-3 text-sm text-rose-200">{error}</p> : null}</CardContent></Card>
     </div>
   </div>;
 }
