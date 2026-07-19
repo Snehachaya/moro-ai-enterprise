@@ -7,6 +7,7 @@ import { ModulePricing } from "@/components/modules/ModulePricing";
 import { ModuleRelated } from "@/components/modules/ModuleRelated";
 import { ModuleWorkflow } from "@/components/modules/ModuleWorkflow";
 import { AssetOwnerConsole } from "@/components/modules/AssetOwnerConsole";
+import { AccidentDetectionConsole } from "@/components/modules/AccidentDetectionConsole";
 import { ThreatScenarios } from "@/components/modules/ThreatScenarios";
 import { routes } from "@/routes/paths";
 import type { DetectionModule } from "@/types/module";
@@ -33,6 +34,7 @@ export function ModuleDetailPage({ module }: ModuleDetailPageProps) {
       <ModuleHero module={module} />
       <ModuleWorkflow module={module} />
       {module.id === "object" ? <AssetOwnerConsole /> : null}
+      {module.id === "accident" ? <AccidentDetectionConsole /> : null}
       {module.id === "threat" ? <ThreatScenarios module={module} /> : null}
       <ModuleCapabilities module={module} />
       <ModulePricing module={module} />
