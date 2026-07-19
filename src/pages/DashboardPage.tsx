@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DashboardFooter } from "@/components/dashboard/DashboardFooter";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardTopbar } from "@/components/dashboard/DashboardTopbar";
@@ -8,6 +9,7 @@ import { dashboardKpis } from "@/data/dashboard";
 import { useSubscriptionStore } from "@/store/subscriptionStore";
 import { LiveObjectDetectionPage } from "@/pages/LiveObjectDetectionPage";
 import { Card, CardContent } from "@/components/ui/Card";
+import { AccidentDetectionConsole } from "@/components/modules/AccidentDetectionConsole";
 
 export function DashboardPage() {
   const [selectedModule, setSelectedModule] = useState("object");
@@ -28,7 +30,7 @@ export function DashboardPage() {
               <KpiCard key={metric.id} metric={metric} />
             ))}
           </div>
-          {selectedModule === "object" && subscribedIds.includes("object-detection") ? <LiveObjectDetectionPage embedded /> : selectedModule === "object" ? <Card><CardContent><h2 className="text-xl font-semibold text-white">Object Detection is inactive</h2><p className="mt-2 text-sm text-slate-400">Start the Object Detection trial to open the live camera from this dashboard.</p></CardContent></Card> : <LiveCameraPanel />}
+          {selectedModule === "object" && subscribedIds.includes("object-detection") ? <LiveObjectDetectionPage embedded /> : selectedModule === "object" ? <Card><CardContent><h2 className="text-xl font-semibold text-white">Object Detection is inactive</h2><p className="mt-2 text-sm text-slate-400">Start the Object Detection trial to open the live camera from this dashboard.</p></CardContent></Card> : selectedModule === "accident" ? <AccidentDetectionConsole /> : <LiveCameraPanel />}
           <EventTable />
         </section>
       </div>
@@ -36,4 +38,3 @@ export function DashboardPage() {
     </div>
   );
 }
-import { useState } from "react";
