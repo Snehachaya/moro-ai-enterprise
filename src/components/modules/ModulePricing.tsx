@@ -4,12 +4,20 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { routes } from "@/routes/paths";
 import type { DetectionModule } from "@/types/module";
+import { useSubscriptionStore } from "@/store/subscriptionStore";
 
 interface ModulePricingProps {
   module: DetectionModule;
 }
 
 export function ModulePricing({ module }: ModulePricingProps) {
+  const addModule = useSubscriptionStore((state) => state.addModule);
+  const isAvailable = module.id === "object" || module.id === "accident";
+
+  if (!isAvailable) {
+    return <section className="rounded-2xl border border-dashed border-amber-300/25 bg-amber-400/[0.04] p-8 text-center"><p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-200">Coming soon</p><h2 className="mt-4 text-3xl font-semibold text-white">{module.name} is still in development</h2><p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400">This module is not completed yet. It will be added to the subscription marketplace in a future release.</p></section>;
+  }
+
   if (module.id === "threat") {
     return (
       <section className="mx-auto max-w-5xl border border-dashed border-cyan-300/40 bg-[#0b0f16]/80 p-8 shadow-[0_0_36px_rgba(6,182,212,0.08)]">
@@ -83,9 +91,9 @@ export function ModulePricing({ module }: ModulePricingProps) {
           <p className="mt-4 text-3xl font-semibold text-white">{module.price}</p>
           <p className="mt-3 text-sm leading-6 text-slate-400">{module.pricingNote}</p>
           <Link to={routes.subscription} className="mt-6 block">
-            <Button className="w-full" size="lg">
+            <Button className="w-full" size="lg" onClick={() => addModule(`${module.id}-detection`)}>
               <CreditCard className="h-5 w-5" aria-hidden="true" />
-              Subscribe
+              Start 30-day trial
             </Button>
           </Link>
           <Link to={routes.marketplace} className="mt-3 block">

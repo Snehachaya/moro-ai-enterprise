@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle2, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/Badge";
@@ -13,13 +13,14 @@ interface ModulePlanCardProps {
 }
 
 export function ModulePlanCard({ module }: ModulePlanCardProps) {
+  const navigate = useNavigate();
   const selectedIds = useSubscriptionStore((state) => state.selectedIds);
   const addModule = useSubscriptionStore((state) => state.addModule);
   const toggleModule = useSubscriptionStore((state) => state.toggleModule);
   const subscribedIds = useSubscriptionStore((state) => state.subscribedIds);
-  const subscribe = useSubscriptionStore((state) => state.subscribe);
   const isSelected = selectedIds.includes(module.id);
   const isSubscribed = subscribedIds.includes(module.id);
+  const isAvailable = module.id === "object-detection" || module.id === "accident-detection";
   const Icon = module.icon;
 
   return (
@@ -62,16 +63,16 @@ export function ModulePlanCard({ module }: ModulePlanCardProps) {
               <p className="text-2xl font-semibold text-white">₹{module.price.toLocaleString("en-IN")}</p>
               <p className="text-xs text-slate-500">per {module.billingCycle}</p>
             </div>
-            {isSubscribed ? <Badge variant="success">Subscribed</Badge> : isSelected ? <Badge variant="success">Selected</Badge> : null}
+            {!isAvailable ? <Badge variant="warning">Coming soon</Badge> : isSubscribed ? <Badge variant="success">Trial active</Badge> : isSelected ? <Badge variant="success">Selected</Badge> : null}
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <Button type="button" disabled={isSubscribed} onClick={() => { addModule(module.id); subscribe(module.id); }}>
-              {isSubscribed ? "Active" : "Subscribe"}
+            <Button type="button" disabled={!isAvailable || isSubscribed} onClick={() => { addModule(module.id); navigate("/subscription"); }}>
+              {!isAvailable ? "Coming soon" : isSubscribed ? "Trial active" : "Subscribe"}
             </Button>
-            <Button type="button" variant="secondary" onClick={() => toggleModule(module.id)}>
+            <Button type="button" variant="secondary" disabled={!isAvailable || isSubscribed} onClick={() => toggleModule(module.id)}>
               <ShoppingCart className="h-4 w-4" aria-hidden="true" />
-              {isSelected ? "Remove" : "Add Cart"}
+              {!isAvailable ? "Unavailable" : isSelected ? "Remove" : "Add Cart"}
             </Button>
           </div>
           {module.route ? (

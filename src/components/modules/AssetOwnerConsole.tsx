@@ -20,10 +20,10 @@ const events = [
 
 export function AssetOwnerConsole() {
   const subscribed = useSubscriptionStore((state) => state.subscribedIds.includes("object-detection"));
-  const subscribe = useSubscriptionStore((state) => state.subscribe);
+  const addModule = useSubscriptionStore((state) => state.addModule);
 
   if (!subscribed) {
-    return <section className="rounded-2xl border border-cyan-300/25 bg-gradient-to-br from-cyan-400/10 to-slate-950 p-8 text-center"><CreditCard className="mx-auto h-9 w-9 text-cyan-200" /><Badge variant="accent" className="mt-5">Object Detection add-on</Badge><h2 className="mt-4 text-3xl font-semibold text-white">Asset Owner Identification</h2><p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400">Subscribe to Object Detection while logged in to unlock browser webcam detection, device-local asset registration, and owner-aware detection overlays.</p><div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Button size="lg" onClick={()=>subscribe("object-detection")}>Subscribe to Object Detection</Button><Link to={routes.marketplace}><Button variant="secondary" size="lg">View marketplace</Button></Link></div></section>;
+    return <section className="rounded-2xl border border-cyan-300/25 bg-gradient-to-br from-cyan-400/10 to-slate-950 p-8 text-center"><CreditCard className="mx-auto h-9 w-9 text-cyan-200" /><Badge variant="accent" className="mt-5">Object Detection add-on</Badge><h2 className="mt-4 text-3xl font-semibold text-white">Asset Owner Identification</h2><p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400">Start a 30-day Object Detection trial to unlock browser webcam detection, device-local asset registration, and owner-aware detection overlays. No payment details are required.</p><div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link to={routes.subscription}><Button size="lg" onClick={()=>addModule("object-detection")}>Start subscription</Button></Link><Link to={routes.marketplace}><Button variant="secondary" size="lg">View marketplace</Button></Link></div></section>;
   }
 
   return (
