@@ -4,7 +4,7 @@ import { Link, Navigate } from "react-router-dom";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { cosineSimilarity, extractEmbedding, loadOwnerIdentificationModel, normalizeObjectType } from "@/lib/ownerIdentification";
+import { cosineSimilarity, extractEmbedding, normalizeObjectType } from "@/lib/ownerIdentification";
 import { routes } from "@/routes/paths";
 import { useAssetRegistryStore, type RegisteredAsset } from "@/store/assetRegistryStore";
 import { useSubscriptionStore } from "@/store/subscriptionStore";
@@ -34,7 +34,8 @@ function detectionKey(className: string, bbox: [number, number, number, number])
 async function identifyOwner(video: HTMLVideoElement, bbox: [number, number, number, number], objectType: string, assets: RegisteredAsset[]) {
   const [x, y, width, height] = bbox;
   const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(width)); canvas.height = Math.max(1, Math.round(height));
+  const scale = Math.min(1, 224 / Math.max(width, height));
+  canvas.width = Math.max(1, Math.round(width * scale)); canvas.height = Math.max(1, Math.round(height * scale));
   canvas.getContext("2d")?.drawImage(video, x, y, width, height, 0, 0, canvas.width, canvas.height);
   const embedding = await extractEmbedding(canvas);
   const normalizedType = normalizeObjectType(objectType);
@@ -64,6 +65,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
   const pendingRef = useRef(new Set<string>());
   const stableRef = useRef(new Map<string, number>());
   const lastOwnerScanRef = useRef(0);
+  const lastOwnerMatchRef = useRef(new Map<string, number>());
   const [status, setStatus] = useState<CameraStatus>("idle");
   const [detections, setDetections] = useState<Detection[]>([]);
   const [error, setError] = useState("");
@@ -77,7 +79,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
   async function start() {
     const session = sessionRef.current + 1; sessionRef.current = session;
     setStatus("requesting"); setError(""); setDetections([]);
-    matchesRef.current.clear(); pendingRef.current.clear(); stableRef.current.clear();
+    matchesRef.current.clear(); pendingRef.current.clear(); stableRef.current.clear(); lastOwnerMatchRef.current.clear();
     if (!navigator.mediaDevices?.getUserMedia) { setStatus("idle"); setError("Camera access is not supported by this browser. Use Chrome, Edge, or Safari over HTTPS."); return; }
 
     try {
@@ -93,32 +95,38 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
     }
 
     try {
-      const [{ load }, tf] = await Promise.all([import("@tensorflow-models/coco-ssd"), import("@tensorflow/tfjs"), loadOwnerIdentificationModel()]);
+      const [{ load }, tf] = await Promise.all([import("@tensorflow-models/coco-ssd"), import("@tensorflow/tfjs")]);
       await tf.ready();
       const model = await load({ base: "lite_mobilenet_v2" });
       if (sessionRef.current !== session || !streamRef.current) return;
       setStatus("live");
+      const mobileMode = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+      const detectionInterval = mobileMode ? 450 : 180;
+      const ownerInterval = mobileMode ? 3000 : 1200;
+      const maxDetections = mobileMode ? 3 : MAX_DETECTIONS;
       let last = 0; let detecting = false;
       const loop = async (time: number) => {
         if (sessionRef.current !== session || !streamRef.current) return;
         const video = videoRef.current;
-        if (video && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && time - last > 180 && !detecting) {
+        if (video && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && time - last > detectionInterval && !detecting) {
           detecting = true;
           try {
             const raw = await model.detect(video, 12, 0.45);
             const activeClasses = new Set(raw.map((result) => result.class));
             for (const className of activeClasses) stableRef.current.set(className, (stableRef.current.get(className) ?? 0) + 1);
             for (const className of [...stableRef.current.keys()]) if (!activeClasses.has(className)) stableRef.current.set(className, 0);
-            const stable = raw.filter((result) => (stableRef.current.get(result.class) ?? 0) >= STABLE_FRAME_COUNT).slice(0, MAX_DETECTIONS);
+            const stable = raw.filter((result) => (stableRef.current.get(result.class) ?? 0) >= STABLE_FRAME_COUNT).slice(0, maxDetections);
 
-            if (time - lastOwnerScanRef.current > 900) {
+            const hasRegisteredReferences = assets.some((asset) => asset.embeddings?.length || asset.embedding?.length);
+            if (hasRegisteredReferences && time - lastOwnerScanRef.current > ownerInterval) {
               lastOwnerScanRef.current = time;
               for (const result of stable) {
                 const bbox = result.bbox as [number, number, number, number];
                 const key = detectionKey(result.class, bbox);
-                if (!pendingRef.current.has(key)) {
+                const recentlyMatched = time - (lastOwnerMatchRef.current.get(key) ?? -Infinity) < (mobileMode ? 10000 : 5000);
+                if (!pendingRef.current.has(key) && !recentlyMatched) {
                   pendingRef.current.add(key); matchesRef.current.set(key, { similarity: 0, status: "Identifying" });
-                  void identifyOwner(video, bbox, result.class, assets).then((match) => matchesRef.current.set(key, match)).catch(() => matchesRef.current.set(key, { similarity: 0, status: "Unknown" })).finally(() => pendingRef.current.delete(key));
+                  void identifyOwner(video, bbox, result.class, assets).then((match) => { matchesRef.current.set(key, match); lastOwnerMatchRef.current.set(key, performance.now()); }).catch(() => matchesRef.current.set(key, { similarity: 0, status: "Unknown" })).finally(() => pendingRef.current.delete(key));
                 }
               }
             }

@@ -45,7 +45,19 @@ export async function imageFromDataUrl(dataUrl: string) {
 export async function cropImage(dataUrl: string, area: { x: number; y: number; width: number; height: number }) {
   const image = await imageFromDataUrl(dataUrl);
   const canvas = document.createElement("canvas");
-  canvas.width = area.width; canvas.height = area.height;
-  canvas.getContext("2d")?.drawImage(image, area.x, area.y, area.width, area.height, 0, 0, area.width, area.height);
-  return canvas.toDataURL("image/jpeg", 0.9);
+  const scale = Math.min(1, 320 / Math.max(area.width, area.height));
+  canvas.width = Math.max(1, Math.round(area.width * scale));
+  canvas.height = Math.max(1, Math.round(area.height * scale));
+  canvas.getContext("2d")?.drawImage(image, area.x, area.y, area.width, area.height, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/jpeg", 0.78);
+}
+
+export async function optimizeReferenceImage(dataUrl: string) {
+  const image = await imageFromDataUrl(dataUrl);
+  const scale = Math.min(1, 320 / Math.max(image.naturalWidth, image.naturalHeight));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+  canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+  canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/jpeg", 0.78);
 }
