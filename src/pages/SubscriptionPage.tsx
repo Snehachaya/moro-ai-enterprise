@@ -3,7 +3,6 @@ import { CalendarDays, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
-import { billingSummary, purchasedModules } from "@/data/account";
 import { marketplaceModules } from "@/data/marketplace";
 import { routes } from "@/routes/paths";
 import {
@@ -18,8 +17,7 @@ export function SubscriptionPage() {
   const subscribedIds = useSubscriptionStore((state) => state.subscribedIds);
   const trialEndsAt = useSubscriptionStore((state) => state.trialEndsAt);
   const subscribeSelected = useSubscriptionStore((state) => state.subscribeSelected);
-  const activeModuleIds = new Set(purchasedModules.map((module) => `${module.id}-detection`));
-  const activeModules = marketplaceModules.filter((module) => activeModuleIds.has(module.id) || subscribedIds.includes(module.id));
+  const activeModules = marketplaceModules.filter((module) => subscribedIds.includes(module.id));
   const isCheckoutMode = selectedModules.length > 0;
   const displayedModules = isCheckoutMode ? selectedModules : activeModules;
 
@@ -81,6 +79,7 @@ export function SubscriptionPage() {
                 </div>
               );
             })}
+            {!isCheckoutMode && displayedModules.length === 0 ? <div className="rounded-xl border border-dashed border-borderSubtle p-10 text-center"><h3 className="font-semibold text-white">No active modules</h3><p className="mt-2 text-sm text-slate-500">Start a trial for Object Detection or Accident Detection to activate a module.</p></div> : null}
           </CardContent>
         </Card>
 
@@ -88,19 +87,8 @@ export function SubscriptionPage() {
           <CardHeader><h2 className="text-xl font-semibold text-white">{isCheckoutMode ? "Trial summary" : "Current plan"}</h2></CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-3">
-              {!isCheckoutMode ? (
-                <>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Plan</span>
-                    <span className="font-medium text-white">{billingSummary.currentPlan}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Next renewal</span>
-                    <span className="font-medium text-white">{billingSummary.nextRenewal}</span>
-                  </div>
-                </>
-              ) : null}
-              <div className="flex justify-between text-sm"><span className="text-slate-400">{isCheckoutMode ? "Trial period" : "Monthly billing"}</span><span className="font-medium text-white">{isCheckoutMode ? "30 days free" : billingSummary.monthlyBilling}</span></div>
+              {!isCheckoutMode ? <div className="flex justify-between text-sm"><span className="text-slate-400">Plan status</span><span className="font-medium text-white">{activeModules.length ? "Trial active" : "Inactive"}</span></div> : null}
+              <div className="flex justify-between text-sm"><span className="text-slate-400">{isCheckoutMode ? "Trial period" : "Payment due"}</span><span className="font-medium text-white">{isCheckoutMode ? "30 days free" : "₹0"}</span></div>
               {isCheckoutMode ? (
                 <>
                   <div className="border-t border-borderSubtle pt-4">
@@ -114,7 +102,7 @@ export function SubscriptionPage() {
                 <div className="border-t border-borderSubtle pt-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-slate-400">Modules active</span>
-                    <span className="text-3xl font-semibold text-white">{activeModules.length} / 6</span>
+                    <span className="text-3xl font-semibold text-white">{activeModules.length} / 5</span>
                   </div>
                 </div>
               )}
