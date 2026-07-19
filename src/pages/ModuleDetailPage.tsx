@@ -32,7 +32,7 @@ export function ModuleDetailPage({ module }: ModuleDetailPageProps) {
       </div>
       <ModuleHero module={module} />
       <ModuleWorkflow module={module} />
-      {module.id === "owner" ? <AssetOwnerConsole /> : null}
+      {module.id === "object" ? <AssetOwnerConsole /> : null}
       {module.id === "threat" ? <ThreatScenarios module={module} /> : null}
       <ModuleCapabilities module={module} />
       <ModulePricing module={module} />

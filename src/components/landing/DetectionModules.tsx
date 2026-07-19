@@ -1,4 +1,4 @@
-import { AlertTriangle, Boxes, Cross, Fingerprint, ShieldAlert, UserRoundSearch } from "lucide-react";
+import { AlertTriangle, Boxes, Cross, ShieldAlert, UserRoundSearch } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -10,7 +10,6 @@ import type { DetectionModuleId } from "@/types/module";
 const iconByModule: Record<DetectionModuleId, typeof UserRoundSearch> = {
   human: UserRoundSearch,
   object: Boxes,
-  owner: Fingerprint,
   threat: AlertTriangle,
   weapon: ShieldAlert,
   accident: Cross,
@@ -19,7 +18,6 @@ const iconByModule: Record<DetectionModuleId, typeof UserRoundSearch> = {
 const accentByModule: Record<DetectionModuleId, string> = {
   human: "text-cyan-200 bg-cyan-400/10 border-cyan-300/20",
   object: "text-indigo-200 bg-indigo-400/10 border-indigo-300/20",
-  owner: "text-cyan-200 bg-cyan-400/10 border-cyan-300/20",
   threat: "text-rose-200 bg-rose-400/10 border-rose-300/20",
   weapon: "text-pink-200 bg-pink-400/10 border-pink-300/20",
   accident: "text-emerald-200 bg-emerald-400/10 border-emerald-300/20",
@@ -32,10 +30,10 @@ export function DetectionModules() {
         <SectionHeader
           align="center"
           eyebrow="What is MoroAI?"
-          title="Six detection modules working as one security fabric"
+          title="Five detection modules working as one security fabric"
           description="MoroAI combines specialized computer-vision models into a unified command experience for enterprise surveillance teams."
         />
-        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           {detectionModules.map((module, index) => {
             const Icon = iconByModule[module.id];
             return (

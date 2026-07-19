@@ -10,7 +10,7 @@ import { useAssetRegistryStore } from "@/store/assetRegistryStore";
 import { useSubscriptionStore } from "@/store/subscriptionStore";
 
 export function AssetRegistrationPage() {
-  const subscribed = useSubscriptionStore((state) => state.subscribedIds.includes("asset-owner-identification"));
+  const subscribed = useSubscriptionStore((state) => state.subscribedIds.includes("object-detection"));
   const assets = useAssetRegistryStore((state) => state.assets);
   const addAsset = useAssetRegistryStore((state) => state.addAsset);
   const removeAsset = useAssetRegistryStore((state) => state.removeAsset);

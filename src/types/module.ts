@@ -1,4 +1,4 @@
-export type DetectionModuleId = "human" | "object" | "owner" | "threat" | "weapon" | "accident";
+export type DetectionModuleId = "human" | "object" | "threat" | "weapon" | "accident";
 
 export interface DetectionModule {
   id: DetectionModuleId;

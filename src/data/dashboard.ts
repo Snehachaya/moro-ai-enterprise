@@ -38,7 +38,6 @@ export interface ModuleNavItem {
 export const moduleNavItems: ModuleNavItem[] = [
   { id: "human", label: "Human", status: "ACTIVE", count: 1284, route: "/modules/human-detection" },
   { id: "object", label: "Object", status: "TRACKING", count: 4912, route: "/modules/object-detection" },
-  { id: "owner", label: "Asset Owner", status: "MATCHING", count: 128, route: "/modules/asset-owner-identification" },
   { id: "threat", label: "Threat", status: "CRITICAL", count: 12, route: "/modules/threat-detection" },
   { id: "weapon", label: "Weapon", status: "CLEARED", count: 0, route: "/modules/weapon-detection" },
   { id: "accident", label: "Accident", status: "RESOLVING", count: 2, route: "/modules/accident-detection" },

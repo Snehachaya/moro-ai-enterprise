@@ -11,7 +11,7 @@ import { useSubscriptionStore } from "@/store/subscriptionStore";
 interface Detection { bbox: [number, number, number, number]; class: string; score: number; }
 
 export function LiveObjectDetectionPage() {
-  const subscribed = useSubscriptionStore((state) => state.subscribedIds.includes("asset-owner-identification"));
+  const subscribed = useSubscriptionStore((state) => state.subscribedIds.includes("object-detection"));
   const assets = useAssetRegistryStore((state) => state.assets);
   const videoRef = useRef<HTMLVideoElement>(null); const streamRef = useRef<MediaStream|null>(null); const frameRef = useRef<number>(0);
   const [status,setStatus]=useState<"idle"|"loading"|"live">("idle"); const [detections,setDetections]=useState<Detection[]>([]); const [error,setError]=useState("");

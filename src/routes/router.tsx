@@ -67,7 +67,7 @@ export const router = createBrowserRouter(
             { path: routes.rbac, element: <Navigate to={routes.account} replace /> },
             { path: routes.humanDetection, element: <ModuleDetailPage module={moduleById.human} /> },
             { path: routes.objectDetection, element: <ModuleDetailPage module={moduleById.object} /> },
-            { path: routes.assetOwnerIdentification, element: <ModuleDetailPage module={moduleById.owner} /> },
+            { path: routes.assetOwnerIdentification, element: <Navigate to={routes.objectDetection} replace /> },
             { path: routes.assetRegistration, element: <AssetRegistrationPage /> },
             { path: routes.liveObjectDetection, element: <LiveObjectDetectionPage /> },
             { path: routes.threatDetection, element: <ModuleDetailPage module={moduleById.threat} /> },
