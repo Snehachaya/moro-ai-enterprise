@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Camera, Loader2, ScanLine, StopCircle, UserRound } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, RefreshCw, ScanLine, StopCircle, UserRound } from "lucide-react";
 import { Link, Navigate } from "react-router-dom";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -69,6 +69,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
   const [status, setStatus] = useState<CameraStatus>("idle");
   const [detections, setDetections] = useState<Detection[]>([]);
   const [error, setError] = useState("");
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
 
   useEffect(() => () => {
     sessionRef.current += 1; cancelAnimationFrame(frameRef.current);
@@ -76,14 +77,14 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
   }, []);
   if (!subscribed) return <Navigate to={routes.assetOwnerIdentification} replace />;
 
-  async function start() {
+  async function start(selectedFacingMode = facingMode) {
     const session = sessionRef.current + 1; sessionRef.current = session;
     setStatus("requesting"); setError(""); setDetections([]);
     matchesRef.current.clear(); pendingRef.current.clear(); stableRef.current.clear(); lastOwnerMatchRef.current.clear();
     if (!navigator.mediaDevices?.getUserMedia) { setStatus("idle"); setError("Camera access is not supported by this browser. Use Chrome, Edge, or Safari over HTTPS."); return; }
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: selectedFacingMode }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
       if (sessionRef.current !== session) { stream.getTracks().forEach((track) => track.stop()); return; }
       streamRef.current = stream;
       const video = videoRef.current;
@@ -154,6 +155,13 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
     setStatus("idle"); setDetections([]); setError("");
   }
 
+  function switchCamera() {
+    const next = facingMode === "environment" ? "user" : "environment";
+    const wasOpen = status !== "idle";
+    stop(); setFacingMode(next);
+    if (wasOpen) window.setTimeout(() => void start(next), 0);
+  }
+
   const video = videoRef.current; const vw = video?.videoWidth || 1280; const vh = video?.videoHeight || 720;
   const cameraOpen = ["loading-model", "live", "camera-only"].includes(status);
   const peopleCount = detections.filter((detection) => detection.class === "person").length;
@@ -161,7 +169,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
 
   return <div className={`${embedded ? "" : "mx-auto max-w-7xl pb-12"} space-y-6`}>
     {!embedded ? <Link to={routes.assetOwnerIdentification}><Button variant="secondary"><ArrowLeft className="h-4 w-4" />Back to module</Button></Link> : null}
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><Badge variant="accent">{embedded ? "Object Detection selected" : "Repository model integrated"}</Badge><h1 className={`mt-4 font-semibold text-white ${embedded ? "text-2xl" : "text-4xl"}`}>Live object & person detection</h1><p className="mt-3 text-slate-400">Stable detections and visual owner matching run locally in your browser.</p></div><div>{status === "idle" ? <Button onClick={start}><Camera className="h-4 w-4" />Open webcam</Button> : <Button variant="danger" onClick={stop}><StopCircle className="h-4 w-4" />Stop camera</Button>}</div></div>
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><Badge variant="accent">{embedded ? "Object Detection selected" : "Repository model integrated"}</Badge><h1 className={`mt-4 font-semibold text-white ${embedded ? "text-2xl" : "text-4xl"}`}>Live object & person detection</h1><p className="mt-3 text-slate-400">Stable detections and visual owner matching run locally in your browser.</p></div><div className="flex flex-wrap gap-2"><Button variant="secondary" onClick={switchCamera}><RefreshCw className="h-4 w-4" />{facingMode === "environment" ? "Use front camera" : "Use rear camera"}</Button>{status === "idle" ? <Button onClick={() => void start()}><Camera className="h-4 w-4" />Open {facingMode === "user" ? "front" : "rear"} camera</Button> : <Button variant="danger" onClick={stop}><StopCircle className="h-4 w-4" />Stop camera</Button>}</div></div>
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
       <Card className="overflow-hidden p-0"><div className="relative aspect-video bg-black"><video ref={videoRef} className="h-full w-full object-contain" muted autoPlay playsInline />
         {status === "requesting" ? <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90"><Loader2 className="h-9 w-9 animate-spin text-cyan-200" /><p className="mt-4 text-sm text-slate-300">Waiting for camera permission...</p></div> : null}
