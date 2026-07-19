@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { AlertTriangle, Boxes, Cross, ShieldCheck, UserRoundSearch, type LucideIcon } from "lucide-react";
 import { moduleNavItems } from "@/data/dashboard";
 import { cn } from "@/utils/cn";
@@ -12,7 +11,7 @@ const iconById: Record<string, LucideIcon> = {
   accident: Cross,
 };
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ selectedId, onSelect }: { selectedId: string; onSelect: (id: string) => void }) {
   const subscribedIds = useSubscriptionStore((state) => state.subscribedIds);
   return (
     <aside className="rounded-xl border border-borderSubtle bg-surface/80 p-4 shadow-glass backdrop-blur-xl">
@@ -26,12 +25,13 @@ export function DashboardSidebar() {
           const available = item.id === "object" || item.id === "accident";
           const active = available && subscribedIds.includes(moduleId);
           return (
-            <Link
+            <button
+              type="button"
               key={item.id}
-              to={item.route}
+              onClick={() => onSelect(item.id)}
               className={cn(
                 "flex w-full items-center justify-between rounded-lg border border-transparent px-3 py-3 text-left transition",
-                active ? "bg-cyan-400/10 text-cyan-100" : "text-slate-400 hover:border-borderSubtle hover:bg-white/[0.03]",
+                selectedId === item.id ? "border-cyan-300/30 bg-cyan-400/10 text-cyan-100" : "text-slate-400 hover:border-borderSubtle hover:bg-white/[0.03]",
               )}
             >
               <span className="flex items-center gap-3">
@@ -42,7 +42,7 @@ export function DashboardSidebar() {
                 </span>
               </span>
               <span className="text-sm font-semibold text-white">{active ? item.count : 0}</span>
-            </Link>
+            </button>
           );
         })}
       </nav>

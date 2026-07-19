@@ -38,18 +38,22 @@ async function identifyOwner(video: HTMLVideoElement, bbox: [number, number, num
   canvas.getContext("2d")?.drawImage(video, x, y, width, height, 0, 0, canvas.width, canvas.height);
   const embedding = await extractEmbedding(canvas);
   const normalizedType = normalizeObjectType(objectType);
-  const typed = assets.filter((asset) => normalizeObjectType(asset.objectType) === normalizedType && asset.embedding?.length);
-  const candidates = typed.length ? typed : assets.filter((asset) => asset.embedding?.length);
+  const hasReferences = (asset: RegisteredAsset) => Boolean(asset.embeddings?.length || asset.embedding?.length);
+  const typed = assets.filter((asset) => normalizeObjectType(asset.objectType) === normalizedType && hasReferences(asset));
+  const candidates = typed.length ? typed : assets.filter(hasReferences);
   let asset: RegisteredAsset | undefined;
   let similarity = 0;
   for (const candidate of candidates) {
-    const score = cosineSimilarity(embedding, candidate.embedding);
-    if (score > similarity) { similarity = score; asset = candidate; }
+    const references = candidate.embeddings?.length ? candidate.embeddings : candidate.embedding ? [candidate.embedding] : [];
+    for (const reference of references) {
+      const score = cosineSimilarity(embedding, reference);
+      if (score > similarity) { similarity = score; asset = candidate; }
+    }
   }
   return similarity >= OWNER_MATCH_THRESHOLD ? { asset, similarity, status: "Known" as const } : { similarity, status: "Unknown" as const };
 }
 
-export function LiveObjectDetectionPage() {
+export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boolean }) {
   const subscribed = useSubscriptionStore((state) => state.subscribedIds.includes("object-detection"));
   const assets = useAssetRegistryStore((state) => state.assets);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -147,9 +151,9 @@ export function LiveObjectDetectionPage() {
   const peopleCount = detections.filter((detection) => detection.class === "person").length;
   const objectCount = detections.length - peopleCount;
 
-  return <div className="mx-auto max-w-7xl space-y-6 pb-12">
-    <Link to={routes.assetOwnerIdentification}><Button variant="secondary"><ArrowLeft className="h-4 w-4" />Back to module</Button></Link>
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><Badge variant="accent">Repository model integrated</Badge><h1 className="mt-4 text-4xl font-semibold text-white">Live object & person detection</h1><p className="mt-3 text-slate-400">Stable detections and visual owner matching run locally in your browser.</p></div><div>{status === "idle" ? <Button onClick={start}><Camera className="h-4 w-4" />Open webcam</Button> : <Button variant="danger" onClick={stop}><StopCircle className="h-4 w-4" />Stop camera</Button>}</div></div>
+  return <div className={`${embedded ? "" : "mx-auto max-w-7xl pb-12"} space-y-6`}>
+    {!embedded ? <Link to={routes.assetOwnerIdentification}><Button variant="secondary"><ArrowLeft className="h-4 w-4" />Back to module</Button></Link> : null}
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><Badge variant="accent">{embedded ? "Object Detection selected" : "Repository model integrated"}</Badge><h1 className={`mt-4 font-semibold text-white ${embedded ? "text-2xl" : "text-4xl"}`}>Live object & person detection</h1><p className="mt-3 text-slate-400">Stable detections and visual owner matching run locally in your browser.</p></div><div>{status === "idle" ? <Button onClick={start}><Camera className="h-4 w-4" />Open webcam</Button> : <Button variant="danger" onClick={stop}><StopCircle className="h-4 w-4" />Stop camera</Button>}</div></div>
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
       <Card className="overflow-hidden p-0"><div className="relative aspect-video bg-black"><video ref={videoRef} className="h-full w-full object-contain" muted autoPlay playsInline />
         {status === "requesting" ? <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90"><Loader2 className="h-9 w-9 animate-spin text-cyan-200" /><p className="mt-4 text-sm text-slate-300">Waiting for camera permission...</p></div> : null}

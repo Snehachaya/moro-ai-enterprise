@@ -41,3 +41,11 @@ export async function imageFromDataUrl(dataUrl: string) {
   await image.decode();
   return image;
 }
+
+export async function cropImage(dataUrl: string, area: { x: number; y: number; width: number; height: number }) {
+  const image = await imageFromDataUrl(dataUrl);
+  const canvas = document.createElement("canvas");
+  canvas.width = area.width; canvas.height = area.height;
+  canvas.getContext("2d")?.drawImage(image, area.x, area.y, area.width, area.height, 0, 0, area.width, area.height);
+  return canvas.toDataURL("image/jpeg", 0.9);
+}
