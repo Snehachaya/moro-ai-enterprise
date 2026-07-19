@@ -110,25 +110,37 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
     try {
       const [{ load }, tf] = await Promise.all([import("@tensorflow-models/coco-ssd"), import("@tensorflow/tfjs")]);
       await tf.ready();
-      const model = await load({ base: "lite_mobilenet_v2" });
+      let model = await load({ base: "mobilenet_v2" });
       if (sessionRef.current !== session || !streamRef.current) return;
       setStatus("live");
       const mobileMode = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
-      const detectionInterval = mobileMode ? 450 : 180;
+      const detectionInterval = mobileMode ? 650 : 220;
       const ownerInterval = mobileMode ? 3000 : 1200;
       const maxDetections = mobileMode ? 3 : MAX_DETECTIONS;
-      let last = 0; let detecting = false;
+      const inferenceCanvas = document.createElement("canvas");
+      let last = 0; let detecting = false; let inferenceFailures = 0; let cpuFallbackAttempted = false;
       const loop = async (time: number) => {
         if (sessionRef.current !== session || !streamRef.current) return;
         const video = videoRef.current;
         if (video && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && time - last > detectionInterval && !detecting) {
           detecting = true;
           try {
-            const raw = await model.detect(video, 12, 0.45);
+            const sourceWidth = video.videoWidth;
+            const sourceHeight = video.videoHeight;
+            const inferenceWidth = Math.min(sourceWidth, mobileMode ? 480 : 720);
+            const inferenceHeight = Math.max(1, Math.round(sourceHeight * inferenceWidth / sourceWidth));
+            if (inferenceCanvas.width !== inferenceWidth || inferenceCanvas.height !== inferenceHeight) {
+              inferenceCanvas.width = inferenceWidth; inferenceCanvas.height = inferenceHeight;
+            }
+            inferenceCanvas.getContext("2d", { alpha: false })?.drawImage(video, 0, 0, inferenceWidth, inferenceHeight);
+            const scaleX = sourceWidth / inferenceWidth; const scaleY = sourceHeight / inferenceHeight;
+            const predictions = await model.detect(inferenceCanvas, 15, 0.25);
+            const raw = predictions.map((result) => ({ ...result, bbox: [result.bbox[0] * scaleX, result.bbox[1] * scaleY, result.bbox[2] * scaleX, result.bbox[3] * scaleY] as [number, number, number, number] }));
+            inferenceFailures = 0;
             const activeClasses = new Set(raw.map((result) => result.class));
             for (const className of activeClasses) stableRef.current.set(className, (stableRef.current.get(className) ?? 0) + 1);
             for (const className of [...stableRef.current.keys()]) if (!activeClasses.has(className)) stableRef.current.set(className, 0);
-            const stable = raw.filter((result) => (stableRef.current.get(result.class) ?? 0) >= STABLE_FRAME_COUNT).slice(0, maxDetections);
+            const stable = raw.filter((result) => (stableRef.current.get(result.class) ?? 0) >= (mobileMode ? 2 : STABLE_FRAME_COUNT)).slice(0, maxDetections);
 
             const currentAssets = useAssetRegistryStore.getState().assets;
             const hasRegisteredReferences = currentAssets.some((asset) => asset.embeddings?.length || asset.embedding?.length);
@@ -150,6 +162,24 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
               const key = detectionKey(result.class, bbox);
               return { bbox, class: result.class, score: result.score, key, owner: matchesRef.current.get(key) ?? { similarity: 0, status: "Identifying" } };
             }));
+            last = time;
+          } catch (cause) {
+            inferenceFailures += 1;
+            if (inferenceFailures >= 2 && !cpuFallbackAttempted) {
+              cpuFallbackAttempted = true; setStatus("loading-model");
+              try {
+                model.dispose();
+                await tf.setBackend("cpu"); await tf.ready();
+                model = await load({ base: "lite_mobilenet_v2" });
+                inferenceFailures = 0; setError(""); setStatus("live");
+              } catch (fallbackCause) {
+                setStatus("camera-only");
+                setError(`Camera is open, but this device could not start the detection engine${fallbackCause instanceof Error ? `: ${fallbackCause.message}` : "."}`);
+              }
+            } else if (cpuFallbackAttempted && inferenceFailures >= 2) {
+              setStatus("camera-only");
+              setError(`Camera is open, but object detection failed on this device${cause instanceof Error ? `: ${cause.message}` : "."}`);
+            }
             last = time;
           } finally { detecting = false; }
         }
