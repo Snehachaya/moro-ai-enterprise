@@ -35,6 +35,22 @@ export const detectionModules: DetectionModule[] = [
     accent: "blue",
   },
   {
+    id: "owner",
+    name: "Asset Owner Identification",
+    route: routes.assetOwnerIdentification,
+    title: "Know Every Asset. Identify Every Owner.",
+    summary: "Matches detected laptops, phones, tools, and devices to registered owners in real time.",
+    description:
+      "Connect generic YOLO detections to your asset registry with MobileNetV2 embeddings, similarity scoring, and a review queue for unknown equipment.",
+    capabilities: ["Owner matching", "Asset registry", "Unknown asset review"],
+    features: ["Real-time owner overlays", "Multi-image asset enrollment", "Unknown capture queue", "SQLite registry", "Similarity controls"],
+    workflow: ["Detect Asset", "Create Embedding", "Match Registry", "Identify Owner"],
+    price: "₹899/month",
+    pricingNote: "Includes registry management, owner matching, and unknown-asset review workflows.",
+    metric: { label: "Owner match accuracy", value: "96.4%" },
+    accent: "cyan",
+  },
+  {
     id: "threat",
     name: "Threat Detection",
     route: routes.threatDetection,

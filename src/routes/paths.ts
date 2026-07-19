@@ -17,6 +17,7 @@ export const routes = {
   rbac: "/account/rbac",
   humanDetection: "/modules/human-detection",
   objectDetection: "/modules/object-detection",
+  assetOwnerIdentification: "/modules/asset-owner-identification",
   threatDetection: "/modules/threat-detection",
   weaponDetection: "/modules/weapon-detection",
   accidentDetection: "/modules/accident-detection",

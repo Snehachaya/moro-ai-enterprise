@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { AlertTriangle, Boxes, Cross, ShieldCheck, UserRoundSearch, type LucideIcon } from "lucide-react";
+import { AlertTriangle, Boxes, Cross, Fingerprint, ShieldCheck, UserRoundSearch, type LucideIcon } from "lucide-react";
 import { moduleNavItems } from "@/data/dashboard";
 import { cn } from "@/utils/cn";
 
 const iconById: Record<string, LucideIcon> = {
   human: UserRoundSearch,
   object: Boxes,
+  owner: Fingerprint,
   threat: AlertTriangle,
   weapon: ShieldCheck,
   accident: Cross,

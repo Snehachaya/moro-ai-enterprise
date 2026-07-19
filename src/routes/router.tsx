@@ -65,6 +65,7 @@ export const router = createBrowserRouter(
             { path: routes.rbac, element: <Navigate to={routes.account} replace /> },
             { path: routes.humanDetection, element: <ModuleDetailPage module={moduleById.human} /> },
             { path: routes.objectDetection, element: <ModuleDetailPage module={moduleById.object} /> },
+            { path: routes.assetOwnerIdentification, element: <ModuleDetailPage module={moduleById.owner} /> },
             { path: routes.threatDetection, element: <ModuleDetailPage module={moduleById.threat} /> },
             { path: routes.weaponDetection, element: <ModuleDetailPage module={moduleById.weapon} /> },
             { path: routes.accidentDetection, element: <ModuleDetailPage module={moduleById.accident} /> },
