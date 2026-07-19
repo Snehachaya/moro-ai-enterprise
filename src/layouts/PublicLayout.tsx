@@ -59,6 +59,9 @@ export function PublicLayout() {
               )}
             </nav>
             <div className="flex items-center gap-2">
+              <Link to={routes.marketplace}>
+                <Button variant="ghost" size="sm">Marketplace</Button>
+              </Link>
               {isAuthenticated ? (
                 <Link to={routes.dashboard}>
                   <Button size="sm">
