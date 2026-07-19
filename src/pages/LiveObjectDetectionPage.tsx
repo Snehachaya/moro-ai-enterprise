@@ -13,7 +13,8 @@ interface OwnerMatch { asset?: RegisteredAsset; similarity: number; status: "Kno
 interface Detection { bbox: [number, number, number, number]; class: string; score: number; key: string; owner: OwnerMatch; }
 type CameraStatus = "idle" | "requesting" | "loading-model" | "live" | "camera-only";
 
-const OWNER_MATCH_THRESHOLD = 0.6;
+const PERSON_MATCH_THRESHOLD = 0.42;
+const OBJECT_MATCH_THRESHOLD = 0.56;
 const MAX_DETECTIONS = 5;
 const STABLE_FRAME_COUNT = 3;
 
@@ -28,35 +29,45 @@ function cameraErrorMessage(cause: unknown) {
 
 function detectionKey(className: string, bbox: [number, number, number, number]) {
   const [x, y, width, height] = bbox;
-  return `${className}:${Math.floor((x + width / 2) / 120)}:${Math.floor((y + height / 2) / 120)}:${Math.floor(Math.sqrt(width * height) / 120)}`;
+  return `${className}:${Math.floor((x + width / 2) / 220)}:${Math.floor((y + height / 2) / 220)}:${Math.floor(Math.sqrt(width * height) / 180)}`;
 }
 
 async function identifyOwner(video: HTMLVideoElement, bbox: [number, number, number, number], objectType: string, assets: RegisteredAsset[]) {
   const [x, y, width, height] = bbox;
-  const canvas = document.createElement("canvas");
-  const scale = Math.min(1, 224 / Math.max(width, height));
-  canvas.width = Math.max(1, Math.round(width * scale)); canvas.height = Math.max(1, Math.round(height * scale));
-  canvas.getContext("2d")?.drawImage(video, x, y, width, height, 0, 0, canvas.width, canvas.height);
-  const embedding = await extractEmbedding(canvas);
   const normalizedType = normalizeObjectType(objectType);
+  const regions = normalizedType === "person"
+    ? [[x, y, width, height], [x, y, width, Math.max(1, height * 0.55)]]
+    : [[x, y, width, height]];
+  const liveEmbeddings = await Promise.all(regions.map(async ([regionX, regionY, regionWidth, regionHeight]) => {
+    const canvas = document.createElement("canvas");
+    const scale = Math.min(1, 224 / Math.max(regionWidth, regionHeight));
+    canvas.width = Math.max(1, Math.round(regionWidth * scale)); canvas.height = Math.max(1, Math.round(regionHeight * scale));
+    canvas.getContext("2d")?.drawImage(video, regionX, regionY, regionWidth, regionHeight, 0, 0, canvas.width, canvas.height);
+    return extractEmbedding(canvas);
+  }));
   const hasReferences = (asset: RegisteredAsset) => Boolean(asset.embeddings?.length || asset.embedding?.length);
-  const typed = assets.filter((asset) => normalizeObjectType(asset.objectType) === normalizedType && hasReferences(asset));
+  const typed = assets.filter((asset) => {
+    const category = asset.category ?? (normalizeObjectType(asset.objectType) === "person" ? "person" : "asset");
+    return hasReferences(asset) && (normalizedType === "person" ? category === "person" : normalizeObjectType(asset.objectType) === normalizedType);
+  });
   const candidates = typed.length ? typed : assets.filter(hasReferences);
   let asset: RegisteredAsset | undefined;
   let similarity = 0;
   for (const candidate of candidates) {
     const references = candidate.embeddings?.length ? candidate.embeddings : candidate.embedding ? [candidate.embedding] : [];
     for (const reference of references) {
-      const score = cosineSimilarity(embedding, reference);
-      if (score > similarity) { similarity = score; asset = candidate; }
+      for (const embedding of liveEmbeddings) {
+        const score = cosineSimilarity(embedding, reference);
+        if (score > similarity) { similarity = score; asset = candidate; }
+      }
     }
   }
-  return similarity >= OWNER_MATCH_THRESHOLD ? { asset, similarity, status: "Known" as const } : { similarity, status: "Unknown" as const };
+  const threshold = normalizedType === "person" ? PERSON_MATCH_THRESHOLD : OBJECT_MATCH_THRESHOLD;
+  return similarity >= threshold ? { asset, similarity, status: "Known" as const } : { similarity, status: "Unknown" as const };
 }
 
 export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boolean }) {
   const subscribed = useSubscriptionStore((state) => state.subscribedIds.includes("object-detection"));
-  const assets = useAssetRegistryStore((state) => state.assets);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const frameRef = useRef(0);
@@ -81,6 +92,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
     const session = sessionRef.current + 1; sessionRef.current = session;
     setStatus("requesting"); setError(""); setDetections([]);
     matchesRef.current.clear(); pendingRef.current.clear(); stableRef.current.clear(); lastOwnerMatchRef.current.clear();
+    await useAssetRegistryStore.getState().syncAssets();
     if (!navigator.mediaDevices?.getUserMedia) { setStatus("idle"); setError("Camera access is not supported by this browser. Use Chrome, Edge, or Safari over HTTPS."); return; }
 
     try {
@@ -118,7 +130,8 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
             for (const className of [...stableRef.current.keys()]) if (!activeClasses.has(className)) stableRef.current.set(className, 0);
             const stable = raw.filter((result) => (stableRef.current.get(result.class) ?? 0) >= STABLE_FRAME_COUNT).slice(0, maxDetections);
 
-            const hasRegisteredReferences = assets.some((asset) => asset.embeddings?.length || asset.embedding?.length);
+            const currentAssets = useAssetRegistryStore.getState().assets;
+            const hasRegisteredReferences = currentAssets.some((asset) => asset.embeddings?.length || asset.embedding?.length);
             if (hasRegisteredReferences && time - lastOwnerScanRef.current > ownerInterval) {
               lastOwnerScanRef.current = time;
               for (const result of stable) {
@@ -127,7 +140,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
                 const recentlyMatched = time - (lastOwnerMatchRef.current.get(key) ?? -Infinity) < (mobileMode ? 10000 : 5000);
                 if (!pendingRef.current.has(key) && !recentlyMatched) {
                   pendingRef.current.add(key); matchesRef.current.set(key, { similarity: 0, status: "Identifying" });
-                  void identifyOwner(video, bbox, result.class, assets).then((match) => { matchesRef.current.set(key, match); lastOwnerMatchRef.current.set(key, performance.now()); }).catch(() => matchesRef.current.set(key, { similarity: 0, status: "Unknown" })).finally(() => pendingRef.current.delete(key));
+                  void identifyOwner(video, bbox, result.class, currentAssets).then((match) => { matchesRef.current.set(key, match); lastOwnerMatchRef.current.set(key, performance.now()); }).catch(() => matchesRef.current.set(key, { similarity: 0, status: "Unknown" })).finally(() => pendingRef.current.delete(key));
                 }
               }
             }
