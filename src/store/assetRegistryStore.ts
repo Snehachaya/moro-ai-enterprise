@@ -10,6 +10,7 @@ export interface RegisteredAsset {
   assetName: string;
   assetId: string;
   image?: string;
+  embedding?: number[];
   createdAt: string;
 }
 
