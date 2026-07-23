@@ -29,10 +29,7 @@ export interface BillingSummary {
 }
 
 export const purchasedModules: PurchasedModule[] = [
-  { id: "human", name: "Human Detection", status: "Active", usage: 86, expires: "Dec 2024" },
   { id: "object", name: "Object Detection", status: "Active", usage: 92, expires: "Dec 2024" },
-  { id: "threat", name: "Threat Detection", status: "Active", usage: 70, expires: "Dec 2024" },
-  { id: "weapon", name: "Weapon Detection", status: "Active", usage: 61, expires: "Dec 2024" },
   { id: "accident", name: "Accident Detection", status: "Active", usage: 82, expires: "Dec 2024" },
 ];
 

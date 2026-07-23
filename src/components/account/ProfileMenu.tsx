@@ -170,7 +170,7 @@ export function ProfileMenu({ className, variant = "compact" }: ProfileMenuProps
               </div>
               <div className="mt-4 flex items-center justify-between text-xs text-slate-300">
                 <span>Modules Active</span>
-                <span>{activeModuleCount} / 5</span>
+                <span>{activeModuleCount} / 2</span>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800">
                 <div className="h-full w-full rounded-full bg-accent" />

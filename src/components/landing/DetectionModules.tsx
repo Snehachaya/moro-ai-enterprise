@@ -30,10 +30,10 @@ export function DetectionModules() {
         <SectionHeader
           align="center"
           eyebrow="What is MoroAI?"
-          title="Five detection modules working as one security fabric"
-          description="MoroAI combines specialized computer-vision models into a unified command experience for enterprise surveillance teams."
+          title="Two completed detection modules working as one security fabric"
+          description="MoroAI combines object intelligence and accident detection in a unified command experience for enterprise surveillance teams."
         />
-        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-12 grid gap-4 md:grid-cols-2">
           {detectionModules.map((module, index) => {
             const Icon = iconByModule[module.id];
             return (

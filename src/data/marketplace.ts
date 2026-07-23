@@ -24,7 +24,7 @@ export interface MarketplaceModule {
   highlighted?: boolean;
 }
 
-export const marketplaceModules: MarketplaceModule[] = [
+const allMarketplaceModules: MarketplaceModule[] = [
   {
     id: "human-detection",
     name: "Human Detection",
@@ -92,5 +92,9 @@ export const marketplaceModules: MarketplaceModule[] = [
     highlighted: true,
   },
 ];
+
+export const marketplaceModules = allMarketplaceModules.filter(
+  (module) => module.id === "object-detection" || module.id === "accident-detection",
+);
 
 export const marketplaceBundles = marketplaceModules.filter((module) => module.highlighted);

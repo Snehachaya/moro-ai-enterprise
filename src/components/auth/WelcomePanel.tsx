@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Boxes, CheckCircle2, ShieldAlert, UserRoundSearch } from "lucide-react";
+import { ArrowRight, Boxes, CheckCircle2, Cross } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { routes } from "@/routes/paths";
 
 const modules = [
-  { label: "Human Detection", icon: UserRoundSearch },
   { label: "Object Detection", icon: Boxes },
-  { label: "Threat Detection", icon: ShieldAlert },
+  { label: "Accident Detection", icon: Cross },
 ];
 
 export function WelcomePanel() {

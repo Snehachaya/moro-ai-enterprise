@@ -102,7 +102,7 @@ export function SubscriptionPage() {
                 <div className="border-t border-borderSubtle pt-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-slate-400">Modules active</span>
-                    <span className="text-3xl font-semibold text-white">{activeModules.length} / 5</span>
+                    <span className="text-3xl font-semibold text-white">{activeModules.length} / 2</span>
                   </div>
                 </div>
               )}

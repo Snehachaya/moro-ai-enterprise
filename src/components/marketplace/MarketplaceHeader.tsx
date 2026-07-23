@@ -17,7 +17,7 @@ export function MarketplaceHeader() {
         </Badge>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white md:text-5xl">Choose Your AI Modules</h1>
         <p className="mt-4 text-base leading-7 text-slate-400">
-          Build your security stack with specialized detection modules, bundle savings, and subscription-ready checkout.
+          Subscribe to the completed Object Detection and Accident Detection modules with a 30-day trial.
         </p>
       </div>
       <Link to={routes.subscription}>

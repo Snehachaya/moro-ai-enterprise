@@ -1,7 +1,7 @@
 import { routes } from "@/routes/paths";
 import type { DetectionModule, DetectionModuleId } from "@/types/module";
 
-export const detectionModules: DetectionModule[] = [
+const allDetectionModules: DetectionModule[] = [
   {
     id: "human",
     name: "Human Detection",
@@ -102,6 +102,10 @@ export const detectionModules: DetectionModule[] = [
     accent: "emerald",
   },
 ];
+
+export const detectionModules = allDetectionModules.filter(
+  (module) => module.id === "object" || module.id === "accident",
+);
 
 export const moduleById = detectionModules.reduce<Record<DetectionModuleId, DetectionModule>>(
   (modules, module) => ({

@@ -48,7 +48,7 @@ export function Hero() {
             The Future of Intelligent Surveillance and Safety
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-            Empowering enterprise-grade security with five core detection modules. Real-time vision intelligence for
+            Enterprise-grade security through Object Detection and Accident Detection. Real-time vision intelligence for
             safer sites, faster response, and stronger operational control.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
