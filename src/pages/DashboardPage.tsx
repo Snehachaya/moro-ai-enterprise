@@ -34,7 +34,7 @@ export function DashboardPage() {
       <div className={`grid gap-6 ${sidebarVisible ? "xl:grid-cols-[280px_minmax(0,1fr)]" : "grid-cols-1"}`}>
         {sidebarVisible ? <DashboardSidebar selectedId={selectedModule} onSelect={setSelectedModule} /> : null}
         <section className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-4 sm:grid-cols-2">
             {visibleKpis.map((metric) => (
               <KpiCard key={metric.id} metric={metric} />
             ))}
@@ -47,3 +47,5 @@ export function DashboardPage() {
     </div>
   );
 }
+
+
