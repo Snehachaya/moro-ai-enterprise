@@ -16,6 +16,15 @@ type CameraStatus = "idle" | "requesting" | "loading-model" | "live" | "camera-o
 const PERSON_MATCH_THRESHOLD = 0.42;
 const OBJECT_MATCH_THRESHOLD = 0.56;
 const MAX_DETECTIONS = 5;
+const LOWER_CONFIDENCE_CLASSES = new Set([
+  "chair", "couch", "bed", "dining table", "refrigerator", "tv", "laptop",
+]);
+
+function minimumDetectionScore(className: string) {
+  if (className === "person") return 0.55;
+  if (LOWER_CONFIDENCE_CLASSES.has(className)) return 0.38;
+  return 0.5;
+}
 
 function cameraErrorMessage(cause: unknown) {
   if (cause instanceof DOMException) {
@@ -137,10 +146,13 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
             }
             inferenceCanvas.getContext("2d", { alpha: false })?.drawImage(video, 0, 0, inferenceWidth, inferenceHeight);
             const scaleX = sourceWidth / inferenceWidth; const scaleY = sourceHeight / inferenceHeight;
-            const predictions = await model.detect(inferenceCanvas, 20, 0.05);
+            const predictions = await model.detect(inferenceCanvas, 20, 0.3);
             const raw = predictions.map((result) => ({ ...result, bbox: [result.bbox[0] * scaleX, result.bbox[1] * scaleY, result.bbox[2] * scaleX, result.bbox[3] * scaleY] as [number, number, number, number] }));
             inferenceFailures = 0;
-            const stable = raw.sort((left, right) => right.score - left.score).slice(0, maxDetections);
+            const stable = raw
+              .filter((result) => result.score >= minimumDetectionScore(result.class))
+              .sort((left, right) => right.score - left.score)
+              .slice(0, maxDetections);
             setScanMessage(stable.length ? `${stable.length} prediction${stable.length === 1 ? "" : "s"} received from the camera.` : "AI is scanning frames, but no recognizable COCO object is visible yet.");
 
             const currentAssets = useAssetRegistryStore.getState().assets;
