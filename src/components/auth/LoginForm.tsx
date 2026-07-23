@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CircleUserRound, KeyRound, Mail, Shield } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -35,7 +36,7 @@ export function LoginForm() {
 
   const from = (location.state as RedirectLocationState | null)?.from?.pathname ?? routes.dashboard;
   const onSubmit = handleSubmit(async (values) => {
-    try { setServerError(""); await login(values.email, values.password); navigate(from, { replace: true }); }
+    try { setServerError(""); await login(values.email, values.password, values.remember); navigate(from, { replace: true }); }
     catch (cause) { setServerError(cause instanceof Error ? cause.message : "Unable to sign in."); }
   });
 
@@ -90,7 +91,7 @@ export function LoginForm() {
           />
           Remember me
         </label>
-        <Link to={routes.verify} className="font-medium text-cyan-200 transition hover:text-cyan-100">
+        <Link to={routes.forgotPassword} className="font-medium text-cyan-200 transition hover:text-cyan-100">
           Forgot password?
         </Link>
       </div>
@@ -126,4 +127,3 @@ export function LoginForm() {
     </form>
   );
 }
-import { useState } from "react";

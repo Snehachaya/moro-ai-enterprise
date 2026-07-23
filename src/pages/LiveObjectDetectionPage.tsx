@@ -80,6 +80,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
   const [error, setError] = useState("");
   const [scanMessage, setScanMessage] = useState("");
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
+  const [frameSize, setFrameSize] = useState({ width: 1280, height: 720 });
 
   useEffect(() => () => {
     sessionRef.current += 1; cancelAnimationFrame(frameRef.current);
@@ -100,7 +101,10 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
       streamRef.current = stream;
       const video = videoRef.current;
       if (!video) throw new Error("Camera preview is unavailable.");
-      video.srcObject = stream; await video.play(); setStatus("loading-model");
+      video.srcObject = stream;
+      await video.play();
+      setFrameSize({ width: video.videoWidth || 1280, height: video.videoHeight || 720 });
+      setStatus("loading-model");
     } catch (cause) {
       streamRef.current?.getTracks().forEach((track) => track.stop()); streamRef.current = null;
       setStatus("idle"); setError(cameraErrorMessage(cause)); return;
@@ -203,7 +207,7 @@ export function LiveObjectDetectionPage({ embedded = false }: { embedded?: boole
     if (wasOpen) window.setTimeout(() => void start(next), 0);
   }
 
-  const video = videoRef.current; const vw = video?.videoWidth || 1280; const vh = video?.videoHeight || 720;
+  const vw = frameSize.width; const vh = frameSize.height;
   const cameraOpen = ["loading-model", "live", "camera-only"].includes(status);
   const peopleCount = detections.filter((detection) => detection.class === "person").length;
   const objectCount = detections.length - peopleCount;

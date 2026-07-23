@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { authService } from "@/services/authService";
 
 export interface AuthUser { id: string; name: string; email: string; }
 export interface UserProfile { fullName: string; email: string; phone: string; role: string; workspace: string; }
@@ -11,8 +12,8 @@ interface AuthState {
   isLoading: boolean;
   profile: UserProfile | null;
   initialize: () => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<{ needsEmailConfirmation: boolean }>;
+  login: (email: string, password: string, remember: boolean) => Promise<void>;
+  register: (name: string, organizationName: string, email: string, password: string) => Promise<{ needsEmailConfirmation: boolean }>;
   updateProfile: (profile: UserProfile) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -37,12 +38,23 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: true,
   profile: null,
   initialize: async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) set({ user: mapUser(session.user), profile: await loadProfile(session.user), isAuthenticated: true, isLoading: false });
-    else set({ user: null, profile: null, isAuthenticated: false, isLoading: false });
+    try {
+      const sessionOnly = sessionStorage.getItem("moro-ai-session-only") === "true";
+      const remembered = localStorage.getItem("moro-ai-remember") === "true";
+      if (!sessionOnly && !remembered) await authService.signOut("local");
+      const { data: { session }, error: sessionError } = await authService.getSession();
+      if (sessionError) throw sessionError;
+      if (session) {
+        const { data: { user }, error: userError } = await authService.getUser();
+        if (userError || !user) throw userError ?? new Error("Session validation failed.");
+        set({ user: mapUser(user), profile: await loadProfile(user), isAuthenticated: true, isLoading: false });
+      } else set({ user: null, profile: null, isAuthenticated: false, isLoading: false });
+    } catch {
+      set({ user: null, profile: null, isAuthenticated: false, isLoading: false });
+    }
     if (!authListenerReady) {
       authListenerReady = true;
-      supabase.auth.onAuthStateChange((_event, nextSession) => {
+      authService.onAuthStateChange((_event, nextSession) => {
         if (!nextSession?.user) { set({ user: null, profile: null, isAuthenticated: false, isLoading: false }); return; }
         const nextUser = nextSession.user;
         set({ user: mapUser(nextUser), isAuthenticated: true, isLoading: false });
@@ -50,13 +62,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
     }
   },
-  login: async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  login: async (email, password, remember) => {
+    const { data, error } = await authService.signIn(email, password);
     if (error) throw error;
+    if (data.user && !data.user.email_confirmed_at) {
+      await authService.signOut("local");
+      throw new Error("Confirm your email address before signing in.");
+    }
+    if (remember) {
+      localStorage.setItem("moro-ai-remember", "true");
+      sessionStorage.removeItem("moro-ai-session-only");
+    } else {
+      localStorage.removeItem("moro-ai-remember");
+      sessionStorage.setItem("moro-ai-session-only", "true");
+    }
     if (data.user) set({ user: mapUser(data.user), profile: await loadProfile(data.user), isAuthenticated: true, isLoading: false });
   },
-  register: async (name, email, password) => {
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo: `${window.location.origin}/login` } });
+  register: async (name, organizationName, email, password) => {
+    const { data, error } = await authService.signUp(name, organizationName, email, password);
     if (error) throw error;
     if (data.session && data.user) set({ user: mapUser(data.user), profile: await loadProfile(data.user), isAuthenticated: true, isLoading: false });
     return { needsEmailConfirmation: !data.session };
@@ -64,12 +87,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   updateProfile: async (profile) => {
     const userId = get().user?.id;
     if (!userId) throw new Error("Sign in to update your profile.");
-    const { error } = await supabase.from("profiles").update({ full_name: profile.fullName, email: profile.email, phone: profile.phone, role: profile.role, workspace: profile.workspace, updated_at: new Date().toISOString() }).eq("id", userId);
+    const current = get().profile;
+    if (current?.email && profile.email !== current.email) {
+      const { error: emailError } = await authService.updateEmail(profile.email);
+      if (emailError) throw emailError;
+    }
+    const safeProfile = {
+      ...profile,
+      role: current?.role || "Member",
+      workspace: current?.workspace || "MoroAI Workspace",
+    };
+    const { error } = await supabase.from("profiles").update({ full_name: safeProfile.fullName, email: safeProfile.email, phone: safeProfile.phone, updated_at: new Date().toISOString() }).eq("id", userId);
     if (error) throw error;
-    set({ profile, user: { id: userId, name: profile.fullName, email: profile.email } });
+    set({ profile: safeProfile, user: { id: userId, name: safeProfile.fullName, email: safeProfile.email } });
   },
   logout: async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem("moro-ai-remember");
+    sessionStorage.removeItem("moro-ai-session-only");
+    await authService.signOut("local");
     set({ user: null, profile: null, isAuthenticated: false, isLoading: false });
   },
 }));

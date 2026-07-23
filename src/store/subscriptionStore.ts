@@ -12,11 +12,12 @@ interface SubscriptionState {
 }
 
 async function saveSubscriptions(moduleIds: string[]) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Sign in before starting a trial.");
-  const end = new Date(Date.now() + 30 * 86400000).toISOString();
-  const rows = moduleIds.filter((id) => id === "object-detection" || id === "accident-detection").map((moduleId) => ({ user_id: user.id, module_id: moduleId, trial_ends_at: end }));
-  if (rows.length) { const { error } = await supabase.from("subscriptions").upsert(rows, { onConflict: "user_id,module_id" }); if (error) throw error; }
+  let end = "";
+  for (const moduleId of moduleIds.filter((id) => id === "object-detection" || id === "accident-detection")) {
+    const { data, error } = await supabase.rpc("start_module_trial", { requested_module_id: moduleId });
+    if (error) throw error;
+    end = String(data);
+  }
   return end;
 }
 

@@ -12,6 +12,9 @@ import { MarketplacePage } from "@/pages/MarketplacePage";
 import { ModuleDetailPage } from "@/pages/ModuleDetailPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { RegisterPage } from "@/pages/RegisterPage";
+import { AuthCallbackPage } from "@/pages/AuthCallbackPage";
+import { ForgotPasswordPage } from "@/pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "@/pages/ResetPasswordPage";
 import { RequireAuth } from "@/routes/RequireAuth";
 import { SubscriptionPage } from "@/pages/SubscriptionPage";
 import { VerifyOTPPage } from "@/pages/VerifyOTPPage";
@@ -38,6 +41,9 @@ export const router = createBrowserRouter(
             { path: routes.login, element: <LoginPage /> },
             { path: routes.register, element: <RegisterPage /> },
             { path: routes.verify, element: <VerifyOTPPage /> },
+            { path: routes.authCallback, element: <AuthCallbackPage /> },
+            { path: routes.forgotPassword, element: <ForgotPasswordPage /> },
+            { path: routes.resetPassword, element: <ResetPasswordPage /> },
             { path: routes.otp, element: <Navigate to={routes.verify} replace /> },
             {
               path: routes.welcome,

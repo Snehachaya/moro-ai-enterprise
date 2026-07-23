@@ -1,14 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
+import { env } from "@/config/env";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error("Supabase environment variables are not configured.");
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+export const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    flowType: "pkce",
+    storageKey: "moro-ai-auth",
+  },
+  global: { headers: { "X-Client-Info": "moro-ai-enterprise-web" } },
 });
 
 export const SHARED_ORGANIZATION_ID = "00000000-0000-0000-0000-000000000001";

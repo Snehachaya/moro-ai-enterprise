@@ -9,6 +9,7 @@ import { useAuthStore } from "@/store/authStore";
 
 interface RegisterFormValues {
   fullName: string;
+  organizationName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -18,7 +19,7 @@ interface RegisterFormValues {
 export function RegisterForm() {
   const navigate = useNavigate();
   const createAccount = useAuthStore((state) => state.register);
-  const [serverMessage, setServerMessage] = useState("");
+  const [serverMessage] = useState("");
   const [serverError, setServerError] = useState("");
   const {
     register,
@@ -26,14 +27,16 @@ export function RegisterForm() {
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
-    defaultValues: { fullName: "", email: "", password: "", confirmPassword: "", terms: false },
+    defaultValues: { fullName: "", organizationName: "", email: "", password: "", confirmPassword: "", terms: false },
   });
 
   const onSubmit = handleSubmit(async (values) => {
     try {
       setServerError("");
-      const result = await createAccount(values.fullName, values.email, values.password);
-      if (result.needsEmailConfirmation) { setServerMessage("Account created. Check your email to confirm it, then sign in."); }
+      const result = await createAccount(values.fullName, values.organizationName, values.email, values.password);
+      if (result.needsEmailConfirmation) {
+        navigate(routes.verify, { replace: true, state: { email: values.email } });
+      }
       else navigate(routes.welcome, { replace: true });
     } catch (cause) { setServerError(cause instanceof Error ? cause.message : "Unable to create account."); }
   });
@@ -51,6 +54,19 @@ export function RegisterForm() {
           <UserRound className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" aria-hidden="true" />
           <Input id="fullName" className="pl-10" hasError={Boolean(errors.fullName)} {...register("fullName", { required: "Full name is required." })} />
         </div>
+      </FormField>
+
+      <FormField label="Organization name" htmlFor="organizationName" error={errors.organizationName?.message}>
+        <Input
+          id="organizationName"
+          autoComplete="organization"
+          hasError={Boolean(errors.organizationName)}
+          {...register("organizationName", {
+            required: "Organization name is required.",
+            minLength: { value: 2, message: "Organization name is too short." },
+            maxLength: { value: 100, message: "Organization name is too long." },
+          })}
+        />
       </FormField>
 
       <FormField label="Email address" htmlFor="registerEmail" error={errors.email?.message}>

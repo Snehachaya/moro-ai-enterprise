@@ -79,8 +79,7 @@ export function DashboardLayout() {
               size="sm"
               aria-label="Logout"
               onClick={() => {
-                logout();
-                navigate(routes.home, { replace: true });
+                void logout().then(() => navigate(routes.home, { replace: true }));
               }}
             >
               <LogOut className="h-4 w-4" aria-hidden="true" />

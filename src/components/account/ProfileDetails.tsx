@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Edit3, KeyRound, Save, UserRound } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import { Input } from "@/components/ui/Input";
 import { useAuthStore, type UserProfile } from "@/store/authStore";
+import { routes } from "@/routes/paths";
 
 const emptyProfile: UserProfile = {
   fullName: "",
@@ -58,8 +60,8 @@ export function ProfileDetails() {
       fullName: values.fullName.trim(),
       email: values.email.trim(),
       phone: values.phone.trim(),
-      role: values.role.trim(),
-      workspace: values.workspace.trim(),
+      role: profile?.role ?? "Member",
+      workspace: profile?.workspace ?? "MoroAI Workspace",
     });
     setIsEditing(false);
   });
@@ -128,22 +130,6 @@ export function ProfileDetails() {
                       {...register("phone", { required: "Phone number is required." })}
                     />
                   </FormField>
-                  <FormField label="Assigned role" htmlFor="profileRole" error={errors.role?.message}>
-                    <Input
-                      id="profileRole"
-                      autoComplete="organization-title"
-                      hasError={Boolean(errors.role)}
-                      {...register("role", { required: "Assigned role is required." })}
-                    />
-                  </FormField>
-                  <FormField label="Workspace" htmlFor="profileWorkspace" error={errors.workspace?.message}>
-                    <Input
-                      id="profileWorkspace"
-                      autoComplete="organization"
-                      hasError={Boolean(errors.workspace)}
-                      {...register("workspace", { required: "Workspace is required." })}
-                    />
-                  </FormField>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button type="submit" disabled={isSubmitting}>
@@ -155,10 +141,10 @@ export function ProfileDetails() {
                       Cancel
                     </Button>
                   ) : null}
-                  <Button type="button" variant="secondary">
+                  <Link to={routes.forgotPassword}><Button type="button" variant="secondary">
                     <KeyRound className="h-4 w-4" aria-hidden="true" />
                     Change Password
-                  </Button>
+                  </Button></Link>
                 </div>
               </form>
             ) : (
@@ -180,10 +166,10 @@ export function ProfileDetails() {
                   <Button variant="secondary" className="border-cyan-300/60 text-cyan-100 hover:bg-cyan-300/10" onClick={() => setIsEditing(true)}>
                     Edit Profile
                   </Button>
-                  <Button variant="secondary">
+                  <Link to={routes.forgotPassword}><Button variant="secondary">
                     <KeyRound className="h-4 w-4" aria-hidden="true" />
                     Change Password
-                  </Button>
+                  </Button></Link>
                 </div>
               </>
             )}
